@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1
+        "Guides:"
+    ul
+        each guide, i in guides
+            li
+            a(href="mailto:#{guide.email}")= guide.guide
+            img(src="picture/" + guide.photoPath)

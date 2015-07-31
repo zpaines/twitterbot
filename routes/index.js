@@ -1,10 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var multer = require('multer');
-var photoPath = "/uploads/";
+var photoPath = "uploads/";
 var photoURL = "/picture/";
 var upload = multer({dest: photoPath});
 var path = require('path');
+
+var medic = require('../medic.js');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -35,11 +38,11 @@ router.get('/guidelist', function(req,res) {
 router.post('/addguide', upload.single('guidePicture'), function(req, res) {
   console.log(req.file);
     var db = req.db;
-    var guideName = req.body.guideName;
-    var guideEmail = req.body.guideEmail;
-    var guideMajor = req.body.guideMajor;
-    var guideLanguage = req.body.guideLanguage;
-    var guidePhotoName = req.file.filename;
+    var guideName = medic.sanitize(req.body.guideName);
+    var guideEmail = medic.sanitize(req.body.guideEmail);
+    var guideMajor = medic.sanitize(req.body.guideMajor);
+    var guideLanguage = medic.sanitize(req.body.guideLanguage);
+    var guidePhotoName = medic.sanitize(req.file.filename);
     var collection = db.get('guides');
     console.log(guidePhotoName);
     collection.insert({

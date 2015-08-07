@@ -1,0 +1,79 @@
+POST /newguide
+    {
+        name
+        email
+        major
+        info
+    }
+    {}
+    
+POST /guide/:id/timeslot
+    {
+        start
+        stop
+        auth
+    }
+
+GET /guide/:id
+    {[auth]}
+    {
+        name
+        email
+        major
+        info
+        times
+    }
+
+POST /guide/:id
+    {
+        name
+        email
+        major
+        info
+        times
+        auth
+    }
+    {}
+
+DELETE /guide/:id
+    {
+        auth
+    }
+    {}
+
+GET /guides
+    {
+        [filters]
+    }
+    {
+        json list of objects
+    }
+
+
+POST /appointment
+    {
+        guideid
+        timeslotid
+        email
+    }
+    {
+        unique url
+    }
+
+
+
+
+
+frontend (pages)
+
+CRUD for guides
+login for guides
+
+static main page
+filtered retrieval of guides (filter by timeslot)
+    make appointment
+
+successful appointment
+
+unique urls for appointments
+    delete appointment

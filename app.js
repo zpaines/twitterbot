@@ -5,20 +5,76 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-//var Busboy = require('busboy');
+var medic = require('./medic.js');
+
+// Auth packages
+var session = require('express-session');
+var MongoStore = require('connect-mongostore')(session);
+var passport = require('passport');
+var LocalStrategy = require('passport-local');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/test');
+var dbURI = process.env.MONGO_URI || 'localhost:27017/tours'
+var db = monk(dbURI);
 
+// Setup app
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+// Setup Sessions and Passport
+var dbSettings = {}
+if (dbURI != 'localhost:27017/tours') {
+  // TODO(tfs): Implement non-localhost database hosting
+  dbSettings.db = 'sessions';
+} else {
+  dbSettings.db = 'sessions';
+}
+
+app.use(session({
+    secret: process.env.SECRET || "we are weak",
+    name: "spicy-cookie",
+    store: new MongoStore(dbSettings),
+    proxy: true,
+    resave: true,
+    saveUninitialized: true
+  })
+);
+
+passport.use(new LocalStrategy({
+    usernameField: 'email'
+  },
+  function (email, password, done) {
+    var guides = db.get('guides');
+    guides.find({ 'email': email }, function (err, data) {
+      if (err) {
+        return done(err);
+      }
+
+      if (data.length == 0) {
+        return done(null, false, { message: 'Incorrect username' });
+      } else if (data.length == 1) {
+        if (medic.validateUser(data[0], password)) {
+          console.log('success');
+          return done(null, data[0]);
+        } else {
+          console.log('failure');
+          return done(null, false, { message: 'Incorrect password' });
+        }
+      } else if (data.length > 1) {
+        return done(null, false, { message: 'Error: Multiple users found' });
+      } else {
+        return done(null, false, { message: 'Error: Internal error' });
+      }
+    });
+  }
+));
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -33,7 +89,6 @@ app.use(function(req,res,next) {
 });
 
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

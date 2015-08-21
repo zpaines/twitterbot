@@ -6,6 +6,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var medic = require('./medic.js');
+var multer = require('multer');
+var photoPath = "uploads/";
+var upload = multer({dest: photoPath});
 
 // Auth packages
 var session = require('express-session');
@@ -17,6 +20,9 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var dbURI = process.env.MONGO_URI || 'localhost:27017/tours'
 var db = monk(dbURI);
+
+// Uploading files (guide pictures)
+var upload = multer({dest: photoPath});
 
 // Setup app
 var routes = require('./routes/index');
@@ -75,9 +81,23 @@ passport.use(new LocalStrategy({
   }
 ));
 
+passport.serializeUser(function (user, done) {
+  done(null, user._id);
+});
+
+passport.deserializeUser(function (id, done) {
+  var users = db.get('users');
+
+  users.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -86,6 +106,87 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req,res,next) {
     req.db = db;
     next();
+});
+
+// Cross-origin
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
+  var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
+
+  if (errorMessage != '') {
+    res.status(500);
+    console.log(errorMessage);
+  }
+
+  var raw1 = medic.sanitize(req.body.guidePassword);
+  var raw2 = medic.sanitize(req.body.guidePasswordConfirm);
+
+  var p1 = medic.hashPass(raw1);
+  var p2 = medic.hashPass(raw2);
+
+  if (p1 != p2) {
+    errorMessage += "Passwords do not match;";
+  }
+
+  if (errorMessage == '') {
+    var db = req.db;
+    var guides = db.get('guides');
+
+    guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
+      if (docs.length > 0) {
+        res.json({ error: "That username exists already." });
+      } else {
+        // var newUser = {
+        //   firstName: req.body.firstName,
+        //   lastName: req.body.lastName,
+        //   email: req.body.email,
+        //   userName: req.body.userName,
+        //   hashedPass: p1
+        // };
+
+        var newGuide = {
+          name: medic.sanitize(req.body.guideName),
+          email: medic.sanitize(req.body.guideEmail),
+          major: medic.sanitize(req.body.guideMajor),
+          language: medic.sanitize(req.body.guideLanguage),
+          photoPath: '/picture/' + medic.sanitize(req.file.filename),
+          hashedPassword: p1
+        };
+
+        guides.insert(newGuide, function (err, inserted) {
+          if (!err) {
+            req.logIn(inserted, function (err) {
+              if (err) {
+                res.status(500);
+              } else {
+                res.redirect('/guidelist');
+              }
+            });
+          } else {
+            res.status(500);
+          }
+        });
+      }
+    });
+  }
+});
+
+
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/signin'
+}));
+
+app.get('/logout', function (req, res) {
+  if (req.isAuthenticated()) {
+    req.logout();
+  }
+  res.redirect('/');
 });
 
 app.use('/', routes);
@@ -120,6 +221,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

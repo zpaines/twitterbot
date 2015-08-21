@@ -65,4 +65,8 @@ router.get('/newguide', function(req, res) {
     res.render('newguide', {title: 'Add New Guide'});
 });
 
+router.get('/guidelogin', function(req, res) {
+    res.render('guideLogin', {title: 'Log in'});
+});
+
 module.exports = router;

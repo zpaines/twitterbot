@@ -12,7 +12,7 @@ exports.hashPass = function (password) {
 }
 
 exports.validateUser = function (user, password) {
-	return (sha512(password) == user.hashedPass);
+	return (sha512(password) == user.hashedPassword);
 }
 
 exports.checkKeys = function (body, fields) {
@@ -32,7 +32,7 @@ exports.checkKeys = function (body, fields) {
 
 exports.requireAuth = function (req, res, next) {
 	if (req.isAuthenticated() != true) {
-		res.render('signin', { isAuthenticated: req.isAuthenticated() });
+		res.render('guideLogin', { isAuthenticated: req.isAuthenticated() });
 	} else {
 		next();
 	}

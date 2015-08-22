@@ -1,8 +1,0 @@
-extends layout
-
-block content
-    h1= title
-    form#formLogin(name="login", method="POST", action="/login")
-        input#inputGuideEmail(type="text", placeholder="Email", name="guideEmail")
-        input#inputGuidePassword(type="password", placeholder="Password", name="guidePassword")
-        button#btnSubmit(type="submit") submit

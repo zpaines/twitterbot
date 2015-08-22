@@ -33,6 +33,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+
 // Setup Sessions and Passport
 var dbSettings = {}
 if (dbURI != 'localhost:27017/tours') {
@@ -81,18 +82,17 @@ passport.use(new LocalStrategy({
   }
 ));
 
-passport.serializeUser(function (user, done) {
-  done(null, user._id);
+passport.serializeUser(function (guide, done) {
+  done(null, guide._id);
 });
 
 passport.deserializeUser(function (id, done) {
-  var users = db.get('users');
+  var guides = db.get('guides');
 
-  users.findById(id, function (err, user) {
-    done(err, user);
+  guides.findById(id, function (err, guide) {
+    done(err, guide);
   });
 });
-
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -108,19 +108,18 @@ app.use(function(req,res,next) {
     next();
 });
 
-// Cross-origin
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+// // Cross-origin
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
 
 app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
   if (errorMessage != '') {
     res.status(500);
-    console.log(errorMessage);
   }
 
   var raw1 = medic.sanitize(req.body.guidePassword);
@@ -141,14 +140,6 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
       if (docs.length > 0) {
         res.json({ error: "That username exists already." });
       } else {
-        // var newUser = {
-        //   firstName: req.body.firstName,
-        //   lastName: req.body.lastName,
-        //   email: req.body.email,
-        //   userName: req.body.userName,
-        //   hashedPass: p1
-        // };
-
         var newGuide = {
           name: medic.sanitize(req.body.guideName),
           email: medic.sanitize(req.body.guideEmail),
@@ -164,7 +155,8 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
               if (err) {
                 res.status(500);
               } else {
-                res.redirect('/guidelist');
+                console.log(inserted);
+                res.redirect('/profile');
               }
             });
           } else {
@@ -176,10 +168,9 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   }
 });
 
-
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/signin'
+  successRedirect: '/profile',
+  failureRedirect: '/guidelogin'
 }));
 
 app.get('/logout', function (req, res) {

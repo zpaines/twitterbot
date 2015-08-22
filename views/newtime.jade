@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 New Timeslot
+
+    form#formNewTimeslot(name="newtimeslot", method="POST", action="/timeslot")
+        input#inputDate(type="date", name="date")
+        input#inputTime(type="time", name="time")
+        input#inputDuration(type="text", placeholder="Duration", name="duration")
+        button#btnSubmit(type="submit") submit

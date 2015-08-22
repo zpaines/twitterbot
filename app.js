@@ -173,7 +173,7 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: '/guidelogin'
 }));
 
-app.get('/logout', function (req, res) {
+app.post('/logout', function (req, res) {
   if (req.isAuthenticated()) {
     req.logout();
   }

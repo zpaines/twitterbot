@@ -1,0 +1,7 @@
+extends layout
+
+block content
+    h1 Logout
+
+    form#formLogout(name="logout", method="POST", action="/logout")
+        button#btnSubmit(type="submit") Logout

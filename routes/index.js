@@ -13,6 +13,10 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.get('/logout', medic.requireAuth, function(req, res, next) {
+  res.render('logout');
+});
+
 router.get(photoURL + ':filePath', function(req,res) {
     res.sendFile(path.resolve(photoPath + req.params.filePath));
 });

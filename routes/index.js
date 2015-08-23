@@ -57,9 +57,9 @@ router.post('/timeslot', medic.requireAuth, function(req, res) {
 
   timeslots.insert(newTimeslot, function (err, inserted) {
     if (err) {
-      res.status(500);
+      res.status(500).send({error: 'Could not save timeslot'});
     } else {
-      res.status(200);
+      res.status(200).send('OK');
     }
   });
 });

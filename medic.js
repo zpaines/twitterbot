@@ -32,7 +32,7 @@ exports.checkKeys = function (body, fields) {
 
 exports.requireAuth = function (req, res, next) {
 	if (req.isAuthenticated() != true) {
-		res.render('guideLogin', { isAuthenticated: req.isAuthenticated() });
+		res.status(215).send({error: 'Not authorized'});
 	} else {
 		next();
 	}

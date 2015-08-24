@@ -27,8 +27,8 @@ router.get('/guidelist', function(req,res) {
    var db = req.db;
    var collection = db.get('guides');
    collection.find({},{},function(e,docs) {
-       res.json(docs)
-;    });
+       res.json(docs);
+   });
 });
 
 router.get('/profile', medic.requireAuth, function(req, res) {
@@ -44,11 +44,18 @@ router.get('/guidelogin', function(req, res) {
 });
 
 router.post('/timeslot', medic.requireAuth, function(req, res) {
-  medic.checkKeys(req.body, ['date', 'time', 'duration']);
+  var errorMessage = '';
+  errorMessage = medic.checkKeys(req.body, ['date', 'time', 'duration']);
+  
+  if (errorMessage != '') {
+    return res.status(400).send({error:'Missing fields'});
+  }
+
   var newTimeslot = {
     date: medic.sanitize(req.body.date),
     time: medic.sanitize(req.body.time),
     duration: medic.sanitize(req.body.duration),
+    guideEmail: req.user.email,
     guideID: req.user._id
   }
 
@@ -57,9 +64,9 @@ router.post('/timeslot', medic.requireAuth, function(req, res) {
 
   timeslots.insert(newTimeslot, function (err, inserted) {
     if (err) {
-      res.status(500).send({error: 'Could not save timeslot'});
+      return res.status(500).send({error: 'Could not save timeslot'});
     } else {
-      res.status(200).send('OK');
+      return res.status(200).send('OK');
     }
   });
 });
@@ -77,6 +84,45 @@ router.get('/times', function(req, res) {
 
 router.get('/newtime', medic.requireAuth, function(req, res) {
   res.render('newtime');
+});
+
+// GET route that requires parameters (passed through url formatting - req.query, not req.body)
+router.get('/guidetimes', function(req, res) {
+  var timeslots = req.db.get('timeslots');
+
+  if ('guideEmail' in req.query) {
+    var cleanEmail = medic.sanitize(req.query.guideEmail);
+
+    timeslots.find({guideEmail: cleanEmail}, {}, function (err, docs) {
+      if (err) {
+        return res.status(500).send({error:'Lookup failed'});
+      } else {
+        return res.status(200).send(docs);
+      }
+    });
+
+  // TODO(tfs): Query by guideID currently not functioning properly.
+
+  // } else if ('guideID' in req.query) {
+  //   var cleanID = medic.sanitize(req.query.guideID);
+
+  //   timeslots.find({guideID: cleanID}, {}, function (err, docs) {
+  //     if (err) {
+  //       return res.status(500).send({error:'Lookup failed'});
+  //     } else {
+  //       return res.status(200).send(docs);
+  //     }
+  //   });
+
+  } else {
+    timeslots.find({}, {}, function (err, docs) {
+      if (err) {
+        return res.status(500).send({error:'Lookup failed'});
+      } else {
+        return res.status(200).send(docs);
+      }
+    });
+  }
 });
 
 module.exports = router;

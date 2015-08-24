@@ -117,7 +117,7 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
   if (errorMessage != '') {
-    res.status(500).send({error: "Missing fields"});
+    return res.status(500).send({error: "Missing fields"});
   }
 
   var raw1 = medic.sanitize(req.body.guidePassword);

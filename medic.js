@@ -30,10 +30,24 @@ exports.checkKeys = function (body, fields) {
 	return errorMessage;
 }
 
+exports.checkOptionalKeys = function (body, fields) {
+	var errorMessage = 'Missing fields';
+	var key;
+
+	for (var i = 0; i < fields.length; i++) {
+		key = fields[i];
+		if (key in body) {
+			errorMessage = '';
+		}
+	}
+
+	return errorMessage;
+}
+
 exports.requireAuth = function (req, res, next) {
 	if (req.isAuthenticated() != true) {
-		res.status(215).send({error: 'Not authorized'});
+		return res.status(215).send({error: 'Not authorized'});
 	} else {
-		next();
+		return next();
 	}
 }

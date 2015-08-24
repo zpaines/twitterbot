@@ -4,7 +4,7 @@ var exports = module.exports = {};
 
 exports.sanitize = function (text) {
 	var match = /[<>;&\*\\/\^_~()]/gi;
-	return text.replace(match, '');
+	return String(text).replace(match, '');
 }
 
 exports.hashPass = function (password) {
@@ -24,20 +24,6 @@ exports.checkKeys = function (body, fields) {
 		key = fields[i];
 		if (!(key in body)) {
 			errorMessage += key + ' missing!;';
-		}
-	}
-
-	return errorMessage;
-}
-
-exports.checkOptionalKeys = function (body, fields) {
-	var errorMessage = 'Missing fields';
-	var key;
-
-	for (var i = 0; i < fields.length; i++) {
-		key = fields[i];
-		if (key in body) {
-			errorMessage = '';
 		}
 	}
 

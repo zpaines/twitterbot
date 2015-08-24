@@ -125,4 +125,69 @@ router.get('/guidetimes', function(req, res) {
   }
 });
 
+
+router.get('/newapt', function (req, res) {
+  res.render('makeapt');
+});
+
+router.post('/appointment', function (req, res) {
+  var errorMessage = '';
+  console.log('hi');
+  errorMessage = medic.checkKeys(req.body, ['slotID', 'responseEmail']);
+
+  if (errorMessage != '') {
+    return res.status(400).send({error:"Not enough fields specified"});
+  }
+
+  console.log('b');
+  var apts = req.db.get('appointments');
+  console.log('c');
+  var timeslots = req.db.get('timeslots');
+  console.log('d');
+  var guides = req.db.get('guides');
+  console.log('e');
+
+  timeslots.find({_id: medic.sanitize(req.body.slotID)}, {}, function (err, slotResults) {
+    console.log('f');
+    if ((err) || (slotResults.length != 1)) { return res.status(500).send({error:'Lookup of timeslot failed'}); }
+    slot = slotResults[0];
+    console.log(slot);
+    console.log(slot.guideID);
+    console.log('halp?');
+    console.log(medic.sanitize(String(slot.guideID)));
+    console.log('welp');
+
+    guides.find({_id: medic.sanitize(String(slot.guideID))}, {}, function (er, guideResults) {
+      console.log('g');
+      if ((err) || (guideResults.length != 1)) { return res.status(500).send({error:'Lookup of guide failed'}); }
+      guide = guideResults[0];
+
+      console.log(slot._id);
+      var cleanSlotID = medic.sanitize(String(slot._id));
+      console.log(cleanSlotID);
+      console.log(guide._id);
+      var cleanGuideID = medic.sanitize(String(guide._id));
+      console.log(cleanGuideID);
+      console.log(guide.email);
+      var cleanGuideEmail = medic.sanitize(String(guide.email));
+      console.log(cleanGuideEmail);
+      console.log(req.body.responseEmail);
+      var cleanEmail = medic.sanitize(String(req.body.responseEmail));
+      console.log(cleanEmail);
+
+      var newApt = {
+        timeslotID: cleanSlotID,
+        guideID: cleanGuideID,
+        guideEmail: cleanGuideEmail,
+        responseEmail: cleanEmail
+      }
+
+      apts.insert(newApt, function (e, inserted) {
+        if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
+        return res.status(200).send('OK');
+      });
+    });
+  });
+});
+
 module.exports = router;

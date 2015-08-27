@@ -4,7 +4,7 @@ var exports = module.exports = {};
 
 exports.sanitize = function (text) {
 	var match = /[<>;&\*\\/\^_~()]/gi;
-	return text.replace(match, '');
+	return String(text).replace(match, '');
 }
 
 exports.hashPass = function (password) {
@@ -32,8 +32,8 @@ exports.checkKeys = function (body, fields) {
 
 exports.requireAuth = function (req, res, next) {
 	if (req.isAuthenticated() != true) {
-		res.render('guideLogin', { isAuthenticated: req.isAuthenticated() });
+		return res.status(215).send({error: 'Not authorized'});
 	} else {
-		next();
+		return next();
 	}
 }

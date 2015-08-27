@@ -1,6 +1,7 @@
 // Userlist data array for filling in info box
 //var userListData = [];
-timeslots = []
+timeslots = [];
+guideTimeslots = [];
 startDate = null;
 endDate = null;
 // DOM Ready =============================================================
@@ -92,9 +93,9 @@ function getData(validIDs) {
         error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
     }).done(function(data) {
         $.each(data, function(){
-          if ($.inArray(this._id, validIDs) > -1) {
+          //if ($.inArray(this._id, validIDs) > -1) {
         	 items.push(populateBox(this));
-          }
+          //}
         });
         console.log(items);
         $('#team_list').html(items.join("\n"));
@@ -118,7 +119,7 @@ function populateBox(guideInfo) {
                  '<img src=' +  guideInfo.photoPath + ' class="img-responsive img-circle" alt="">' +
                  '<h4>' + guideInfo.guide + '</h4>' +
                  '<p class="text-muted">' + guideInfo.major + '</p>' +
-                 '<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal' + guideInfo.guide + '">' + 
+                 '<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal' + guideInfo._id + '">' + 
   				  'Make Appointment' +
 			     '</button>' + '<br> <br>' +
 			     '<ul class="list-inline social-buttons"> ' +
@@ -129,7 +130,7 @@ function populateBox(guideInfo) {
                 '</div>' +
                '</li>' +
 
-				'<div class="modal fade" id="myModal' + guideInfo.guide + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
+				'<div class="modal fade" id="myModal' + guideInfo._id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
   				'<div class="modal-dialog" role="document">' + 
     			'<div class="modal-content">' +
       			'<div class="modal-header">' +
@@ -137,8 +138,18 @@ function populateBox(guideInfo) {
         		'<h4 class="modal-title" id="myModalLabel">Modal title</h4>'+
       			'</div>'+
       			'<div class="modal-body">' +
-        		'Make Appointment With ' + guideInfo.guide +
-      			'</div>' +
+        		'Make Appointment With ' + guideInfo.major +
+            '<br>Possible Times are: <br>';
+            console.log(guideTimeslots[guideInfo._id]);
+            if (guideTimeslots[guideInfo._id]) {
+  for (var i=0; i<guideTimeslots[guideInfo._id].length; i++) {
+    var slot = guideTimeslots[guideInfo._id][i];
+    console.log(slot);
+    boxHTML += slot.time + ' on ' + slot.dateString + '<br>';
+  }
+}
+
+  boxHTML +='</div>' +
       			'<div class="modal-footer">' +
         		'<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
         		'<button type="button" class="btn btn-primary">Save changes</button>' +
@@ -158,11 +169,18 @@ function getTimeslots() {
         error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
     }).done(function(data) {
         $.each(data, function(){
+        this.dateString = this.date;
+        if (!guideTimeslots[this.guideID]) {
+          guideTimeslots[this.guideID] = [];
+        }
+        guideTimeslots[this.guideID].push(this);
+
          this.date = this.date.split('-').join('');
          if (!timeslots[parseInt(this.date)]) {
           timeslots[parseInt(this.date)] = [];
          }
          timeslots[parseInt(this.date)].push(this);
+
          console.log(timeslots);
         });
     });

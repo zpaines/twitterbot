@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    h1 MAKE APPOINTMENT
+    form#formApt(name="makeApt", method="POST", action="/appointment")
+        input#inputTimeslotID(type="text", placeholder="ID", name="slotID")
+        input#inputResponseEmail(type="text", placeholder="Email", name="responseEmail")
+        button#btnSubmit(type="submit") submit

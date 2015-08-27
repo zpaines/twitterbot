@@ -67,10 +67,8 @@ passport.use(new LocalStrategy({
         return done(null, false, { message: 'Incorrect username' });
       } else if (data.length == 1) {
         if (medic.validateUser(data[0], password)) {
-          console.log('success');
           return done(null, data[0]);
         } else {
-          console.log('failure');
           return done(null, false, { message: 'Incorrect password' });
         }
       } else if (data.length > 1) {
@@ -119,7 +117,7 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
   if (errorMessage != '') {
-    res.status(500);
+    return res.status(500).send({error: "Missing fields"});
   }
 
   var raw1 = medic.sanitize(req.body.guidePassword);
@@ -153,14 +151,13 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
           if (!err) {
             req.logIn(inserted, function (err) {
               if (err) {
-                res.status(500);
+                res.status(500).send({error: 'Error logging in new user; User saved.'});
               } else {
-                console.log(inserted);
                 res.redirect('/profile');
               }
             });
           } else {
-            res.status(500);
+            res.status(500).send({error: 'Error saving new user.'});
           }
         });
       }
@@ -168,10 +165,22 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   }
 });
 
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/profile',
-  failureRedirect: '/guidelogin'
-}));
+// app.post('/login', passport.authenticate('local', {
+//   successRedirect: '/profile',
+//   failureRedirect: '/guidelogin'
+// }));
+
+// From passport's site
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { return next(err); }
+    if (!user) { return res.status(215).send({error:'Not authorized'}); }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      res.status(200).send('OK');
+    });
+  })(req, res, next);
+});
 
 app.post('/logout', function (req, res) {
   if (req.isAuthenticated()) {

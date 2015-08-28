@@ -21,6 +21,7 @@
     "connect-mongostore": "latest",
     "passport": "latest",
     "passport-local": "latest",
-    "js-sha512": "latest"
+    "js-sha512": "latest",
+    "randomstring": "latest"
   }
 }

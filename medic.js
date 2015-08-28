@@ -8,11 +8,15 @@ exports.sanitize = function (text) {
 }
 
 exports.hashPass = function (password) {
-	return sha512(password);
+	return sha512(password+process.env.HASHSALT);
+}
+
+exports.hashOther = function (input) {
+	return sha512(input+process.env.HASHSALT2);
 }
 
 exports.validateUser = function (user, password) {
-	return (sha512(password) == user.hashedPassword);
+	return (sha512(password+process.env.HASHSALT) == user.hashedPassword);
 }
 
 exports.checkKeys = function (body, fields) {

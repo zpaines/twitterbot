@@ -1,8 +1,18 @@
 extends layout
 
 block content
-    h1= title
-    form#formLogin(name="login", method="POST", action="/login")
-        input#inputGuideEmail(type="text", placeholder="Email", name="email")
-        input#inputGuidePassword(type="password", placeholder="Password", name="password")
-        button#btnSubmit(type="submit") submit
+  link(href='css/bootstrap.min.css', rel='stylesheet')
+  link(href='stylesheets/login.css', rel='stylesheet')
+  div.wrapper
+    form.form-signin(id="loginForm" action="/login", method="POST", name="login")
+      h3.form-signin-heading Welcome! Please Sign In
+        hr.colorgraph
+        div(id="inputFields")
+            input.form-control(type="text", id="emailField", name="email" placeholder="Email")
+            input.form-control(type="password", id="passwordField", name="password", placeholder="Password")
+        button.btn.btn-lg.btn-primary.btn-block(name="login") Login
+  script(src="/js/jquery.js")
+  script(src="/js/bootstrap.min.js")
+  script(src="/javascripts/login.js")
+
+

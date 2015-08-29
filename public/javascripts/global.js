@@ -1,4 +1,4 @@
-// Userlist data array for filling in info box
+/*// Userlist data array for filling in info box
 var userListData = [];
 
 // DOM Ready =============================================================
@@ -38,7 +38,6 @@ function populateTable() {
         $('#wrapper').html(tableContent);
     });
 };
-/*
 // Show User Info
 function showUserInfo(event) {
 
@@ -59,5 +58,4 @@ function showUserInfo(event) {
     $('#guideLanguage').text(thisUserObject.language);
     $('#guidePicture').attr("src", thisUserObject.photoPath);
 
-};
-*/
+};*/

@@ -1,1 +1,55 @@
-h1= name
+extends layout
+
+block content
+    link(href='css/bootstrap.min.css', rel='stylesheet')
+    link(href='stylesheets/profile.css', rel='stylesheet')
+    div.container
+        div.row
+        div.col-md-5.toppad.pull-right.col-md-offset-3
+            A(href="edit.html") Edit Profile   
+            A(href="/login") Logout
+            br
+            p.text-info May 05,2014,03:00 pm
+        div.col-xs-12.col-sm-12.col-md-6.col-lg-6.col-xs-offset-0.col-sm-offset-0.col-md-offset-3.col-lg-offset-3.toppad
+            div.panel.panel-info
+                div.panel-heading
+                    h3.panel-title Test User
+                div.panel-body
+                    div.row
+                        div.col-md-3.col-lg-3(align="center")
+                            img.img-circle.img-responsive(alt="User Pic" src="http://babyinfoforyou.com/wp-content/uploads/2014/10/avatar-300x300.png")
+                        div.col-md-9.col-lg-9 
+                            table.table.table-user-information
+                                tbody
+                                    tr
+                                        td Department:
+                                        td Programming   
+                                    tr
+                                        td Major:
+                                        td Computers                        
+                                               
+                            button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
+                div.panel-footer
+                    a.btn.btn-sm.btn-primary(data-original-title="Broadcast Message" data-toggle="tooltip" type="button")
+                        i.glyphicon.glyphicon-envelope
+                    span.pull-right
+                        a.btn.btn-sm.btn-warning(href="edit.html" data-original-title="Edit this user" data-toggle="tooltip" type="button")
+                            i.glyphicon.glyphicon-edit
+                        span         
+                        a.btn.btn-sm.btn-danger(data-original-title="Remove this user" data-toggle="tooltip" type="button")
+                            i.glyphicon.glyphicon-remove
+        div.modal.fade(id="timeslotModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+            div.modal-dialog(role="document")
+                div.modal-content
+                    div.modal-header
+                        button.close(time="button" data-dismiss="modal" aria-label="Close")
+                            span(aria-hidden="true") &times;
+                        h4.modal-title(id="myModalLabel") Timeslots
+                    div.modal-body(id="timeslotModalBody") 
+                        p Test
+                    div.modal-footer
+                        button.btn.btn-default(data-dismiss="modal") Close
+
+    script(src="/js/jquery.js")
+    script(src="/js/bootstrap.min.js")
+    script(src="/javascripts/profile.js")

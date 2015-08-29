@@ -68,7 +68,7 @@ router.get('/guidelogin', function(req, res) {
 
 router.post('/timeslot', medic.requireAuth, function(req, res) {
   var errorMessage = '';
-  errorMessage = medic.checkKeys(req.body, ['date', 'time', 'duration']);
+  errorMessage = medic.checkKeys(req.body, ['date', 'time']);
   
   if (errorMessage != '') {
     return res.status(400).send({error:'Missing fields'});
@@ -77,7 +77,6 @@ router.post('/timeslot', medic.requireAuth, function(req, res) {
   var newTimeslot = {
     date: medic.sanitize(req.body.date),
     time: medic.sanitize(req.body.time),
-    duration: medic.sanitize(req.body.duration),
     guideEmail: req.user.email,
     randomID: medic.sanitize(randomstring.generate(35))
   }
@@ -87,12 +86,18 @@ router.post('/timeslot', medic.requireAuth, function(req, res) {
   var db = req.db;
   var timeslots = db.get('timeslots');
 
-  timeslots.insert(newTimeslot, function (err, inserted) {
-    if (err) {
-      return res.status(500).send({error: 'Could not save timeslot'});
-    } else {
-      return res.status(200).send('OK');
-    }
+  timeslots.find({date:newTimeslot.date, time:newTimeslot.time, guideEmail:newTimeslot.guideEmail}, {}, function (e, docs) {
+    if (e) { return res.status(500).send({error:"Database error"}); }
+
+    if (docs.length > 0) { return res.status(400).send({error: "Timeslot already exists"}); }
+
+    timeslots.insert(newTimeslot, function (err, inserted) {
+      if (err) {
+        return res.status(500).send({error: 'Could not save timeslot'});
+      } else {
+        return res.status(200).send('OK');
+      }
+    });
   });
 });
 
@@ -138,17 +143,27 @@ router.get('/guidetimes', function(req, res) {
       if (err) {
         return res.status(500).send({error:'Lookup failed'});
       } else {
-        return res.status(200).send(docs);
+        var toReturn = [];
+
+        for (var i = 0; i < docs.length; i++) {
+          var doc = docs[i];
+
+          var newTime = {
+            date: medic.sanitize(doc.date),
+            time: medic.sanitize(doc.time),
+            duration: medic.sanitize(doc.duration),
+            guideEmail: medic.sanitize(doc.guideEmail),
+            randomID: medic.sanitize(doc.randomID)
+          }
+
+          toReturn.push(newTime);
+        }
+      
+        return res.status(200).send(toReturn);
       }
     });
   } else {
-    timeslots.find({}, {}, function (err, docs) {
-      if (err) {
-        return res.status(500).send({error:'Lookup failed'});
-      } else {
-        return res.status(200).send(docs);
-      }
-    });
+    return res.status(400).send({error:'Bad Request'});
   }
 });
 
@@ -189,11 +204,15 @@ router.post('/appointment', function (req, res) {
         randomID: cleanRandomID
       }
 
-      // Send email yay
+      apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
+        if (error) { return res.status(500).send({error:'Database error'}); }
 
-      apts.insert(newApt, function (e, inserted) {
-        if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
-        return res.status(200).send('OK');
+        if (docs.length > 0) { return res.status(400).send({error:'Appointment already exists for specified time slot'}); }
+
+        apts.insert(newApt, function (e, inserted) {
+          if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
+          return res.status(200).send('OK'); // Send email
+        });
       });
     });
   });

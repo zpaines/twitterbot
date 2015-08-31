@@ -39,7 +39,7 @@ router.get('/guidelist', function(req,res) {
         email: medic.sanitize(doc.email),
         major: medic.sanitize(doc.major),
         language: medic.sanitize(doc.language),
-        photoPath: medic.sanitize(doc.photoPath)
+        photoPath: doc.photoPath
       }
       toReturn.push(newGuide);
     }

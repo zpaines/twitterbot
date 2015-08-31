@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    var emailAddress = $('#guideEmailAddress').html();
+    console.log(emailAddress);
     console.log("test");
     var panels = $('.user-infos');
     var panelsButton = $('.dropdown-user');
@@ -7,14 +9,19 @@ $(document).ready(function() {
     var request = $.ajax({
        type: "GET",
        url: "/guidetimes",
-       data: {"guideEmail":"zpaines1@jhu.edu"}, // serializes the form's elements.
+       data: {"guideEmail":emailAddress}, // serializes the form's elements.
      });
     request.success(function(jqXHR, textStatus) {
         console.log("Test");
         $.each(request.responseJSON, function(index, value) {
             console.log(value);
-            $('timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.dateString + '</p>')
+            $('#timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + '&nbsp &nbsp <a class="btn btn-sm btn-danger timeslotDeleteButton" id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </p>')
+            console.log("appended");
         });
+    });
+
+    $('.modal').on("click", '.timeslotDeleteButton', function() {
+      console.log(this.id);
     });
 
     //Click dropdown

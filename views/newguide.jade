@@ -1,13 +1,61 @@
 extends layout
 
 block content
-    h1= title
-    form#formAddGuide(name="newguide", method="POST", enctype="multipart/form-data", action="/guideSignup")
-        input#inputUserName(type="text", placeholder="Name", name="guideName")
-        input#inputUserEmail(type="text", placeholder="Email", name="guideEmail")
-        input#inputUserMajor(type="text", placeholder="Major", name="guideMajor")
-        input#inputUserLanguage(type="text", placeholder="Language", name="guideLanguage")
-        input#inputUserPhoto(type="file", name="guidePicture")
-        input#inputUserPassword(type="password", placeholder="Password", name="guidePassword")
-        input#inputUserPasswordConfirm(type="password", placeholder="Password", name="guidePasswordConfirm")
-        button#btnSubmit(type="submit") submit
+    link(href='css/bootstrap.min.css', rel='stylesheet')
+    link(href='stylesheets/profile.css', rel='stylesheet')
+    div.container
+        form#formAddGuide(name="newguide", method="POST", enctype="multipart/form-data", action="/guideSignup")
+            div.row
+            div.col-md-5.toppad.pull-right.col-md-offset-3
+            div.col-xs-12.col-sm-12.col-md-6.col-lg-6.col-xs-offset-0.col-sm-offset-0.col-md-offset-3.col-lg-offset-3.toppad
+                div.panel.panel-info
+                    div.panel-heading
+                        h3.panel-title Make New Account
+                    div.panel-body
+                        div.row
+                            div.col-md-3.col-lg-3(align="center")
+                                img.img-circle.img-responsive(alt="User Pic" src= "/images/defaultPicture.jpg" )
+                            div.col-md-9.col-lg-9 
+                                table.table.table-user-information
+                                    tbody
+                                        tr
+                                            td Name:
+                                            td
+                                                input(type="text", name="guideName" placeholder="What's Your Name?" class="form-control")
+                                        tr
+                                            td Photo:
+                                            td
+                                                input(type="file", name="guidePicture" class="form-control")
+                                        tr
+                                            td Email:
+                                            td
+                                                input(type="text" name="guideEmail" id="guideEmailAddress" placeholder="What's Your Email Address?" class="form-control")
+                                        tr
+                                            td Major:
+                                            td  
+                                                input(type="text" name="guideMajor" id="guideMajor" placeholder="What's Your Major?" class="form-control")
+                                        tr
+                                            td Language:
+                                            td
+                                                input(type="text" name="guideLanguage" id="guideLanguage" placeholder="What Language Do You Speak?" class="form-control")
+                                        tr
+                                            td Password:
+                                            td
+                                                input(type="password", name="guidePassword" placeholder="Password", class="form-control") 
+                                        tr
+                                            td
+                                            td
+                                                input(type="password", name="guidePasswordConfirm" placeholder="Confirm Password", class="form-control")                     
+                                                   
+                    div.panel-footer
+                        span.pull-right
+                            a.btn.btn-sm.btn-danger(data-original-title="Cancel" data-toggle="tooltip" type="button" href="/login")
+                                i Cancel
+                            span  
+                            button.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="submitButton btnSubmit" action="/guideSignup")
+                                i.glyphicon.glyphicon-ok
+
+    script(src="/js/jquery.js")
+    script(src="/js/bootstrap.min.js")
+    script(src="/javascripts/profile.js")
+

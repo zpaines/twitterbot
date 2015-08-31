@@ -1,0 +1,51 @@
+extends layout
+
+block content
+    link(href='css/bootstrap.min.css', rel='stylesheet')
+    link(href='stylesheets/profile.css', rel='stylesheet')
+    div.container
+        div.row
+        div.col-md-5.toppad.pull-right.col-md-offset-3
+            A(href="/login") Logout
+            br
+        div.col-xs-12.col-sm-12.col-md-6.col-lg-6.col-xs-offset-0.col-sm-offset-0.col-md-offset-3.col-lg-offset-3.toppad
+            div.panel.panel-info
+                div.panel-heading
+                    h3.panel-title #{name}
+                div.panel-body
+                    div.row
+                        div.col-md-3.col-lg-3(align="center")
+                            img.img-circle.img-responsive(alt="User Pic" src= "#{photoPath}" )
+                        div.col-md-9.col-lg-9 
+                            table.table.table-user-information
+                                tbody
+                                    tr
+                                        td Photo:
+                                        td
+                                            input(type="file", name="guidePicture" class="form-control")
+                                    tr
+                                        td Email:
+                                        td
+                                            input(type="text" id="guideEmailAddress" placeholder="#{email}" class="form-control")
+                                    tr
+                                        td Major:
+                                        td  
+                                            input(type="text" id="guideMajor" placeholder="#{major}" class="form-control")
+                                    tr
+                                        td Language:
+                                        td
+                                            input(type="text" id="guideLanguage" placeholder="#{language}" class="form-control")                      
+                                               
+                div.panel-footer
+                    a.btn.btn-sm.btn-danger(data-original-title="Delete Profile" data-toggle="tooltip" type="button")
+                        i Delete Profile
+                    span.pull-right
+                        a.btn.btn-sm.btn-danger(data-original-title="Cancel" data-toggle="tooltip" type="button" href="/profile")
+                            i Cancel
+                        span  
+                        a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button" id="#submitButton")
+                            i.glyphicon.glyphicon-ok
+
+    script(src="/js/jquery.js")
+    script(src="/js/bootstrap.min.js")
+    script(src="/javascripts/profile.js")

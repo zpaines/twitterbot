@@ -58,6 +58,17 @@ router.get('/profile', medic.requireAuth, function(req, res) {
   });
 });
 
+router.get('/edit', medic.requireAuth, function(req, res) {
+  res.render('edit', {
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    major: req.user.major,
+    language: req.user.language,
+    photoPath: req.user.photoPath
+  });
+});
+
 router.get('/newguide', function(req, res) {
   res.render('newguide', {title: 'Add New Guide'});
 });

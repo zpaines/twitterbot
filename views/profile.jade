@@ -6,10 +6,7 @@ block content
     div.container
         div.row
         div.col-md-5.toppad.pull-right.col-md-offset-3
-            A(href="edit.html") Edit Profile   
-            A(href="/login") Logout
             br
-            p.text-info May 05,2014,03:00 pm
         div.col-xs-12.col-sm-12.col-md-6.col-lg-6.col-xs-offset-0.col-sm-offset-0.col-md-offset-3.col-lg-offset-3.toppad
             div.panel.panel-info
                 div.panel-heading
@@ -30,17 +27,13 @@ block content
                                     tr
                                         td Language:
                                         td #{language}                        
-                                               
                             button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
                 div.panel-footer
-                    a.btn.btn-sm.btn-primary(data-original-title="Broadcast Message" data-toggle="tooltip" type="button")
-                        i.glyphicon.glyphicon-envelope
+                    a.btn.btn-sm.btn-danger(href="/logout" data-original-title="Broadcast Message" data-toggle="tooltip" type="button")
+                        i Logout
                     span.pull-right
-                        a.btn.btn-sm.btn-warning(href="edit.html" data-original-title="Edit this user" data-toggle="tooltip" type="button")
+                        a.btn.btn-sm.btn-warning(href="edit" data-original-title="Edit this user" data-toggle="tooltip" type="button")
                             i.glyphicon.glyphicon-edit
-                        span         
-                        a.btn.btn-sm.btn-danger(data-original-title="Remove this user" data-toggle="tooltip" type="button")
-                            i.glyphicon.glyphicon-remove
         div.modal.fade(id="timeslotModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
             div.modal-dialog(role="document")
                 div.modal-content

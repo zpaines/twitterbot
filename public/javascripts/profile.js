@@ -15,9 +15,13 @@ $(document).ready(function() {
         console.log("Test");
         $.each(request.responseJSON, function(index, value) {
             console.log(value);
-            $('#timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + '</p>')
+            $('#timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + '&nbsp &nbsp <a class="btn btn-sm btn-danger timeslotDeleteButton" id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </p>')
             console.log("appended");
         });
+    });
+
+    $('.modal').on("click", '.timeslotDeleteButton', function() {
+      console.log(this.id);
     });
 
     //Click dropdown

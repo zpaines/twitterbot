@@ -114,6 +114,7 @@ app.use(function(req,res,next) {
 // });
 
 app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
+  console.log(req.body);
   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
   if (errorMessage != '') {
@@ -182,11 +183,11 @@ app.post('/login', function(req, res, next) {
   })(req, res, next);
 });
 
-app.post('/logout', function (req, res) {
+app.get('/logout', function (req, res) {
   if (req.isAuthenticated()) {
     req.logout();
   }
-  res.redirect('/');
+  res.redirect('/guideLogin');
 });
 
 app.use('/', routes);

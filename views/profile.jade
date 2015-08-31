@@ -13,20 +13,23 @@ block content
         div.col-xs-12.col-sm-12.col-md-6.col-lg-6.col-xs-offset-0.col-sm-offset-0.col-md-offset-3.col-lg-offset-3.toppad
             div.panel.panel-info
                 div.panel-heading
-                    h3.panel-title Test User
+                    h3.panel-title #{name}
                 div.panel-body
                     div.row
                         div.col-md-3.col-lg-3(align="center")
-                            img.img-circle.img-responsive(alt="User Pic" src="http://babyinfoforyou.com/wp-content/uploads/2014/10/avatar-300x300.png")
+                            img.img-circle.img-responsive(alt="User Pic" src= "#{photoPath}" )
                         div.col-md-9.col-lg-9 
                             table.table.table-user-information
                                 tbody
                                     tr
-                                        td Department:
-                                        td Programming   
+                                        td Email:
+                                        td(id="guideEmailAddress") #{email}
                                     tr
                                         td Major:
-                                        td Computers                        
+                                        td #{major}   
+                                    tr
+                                        td Language:
+                                        td #{language}                        
                                                
                             button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
                 div.panel-footer
@@ -46,7 +49,6 @@ block content
                             span(aria-hidden="true") &times;
                         h4.modal-title(id="myModalLabel") Timeslots
                     div.modal-body(id="timeslotModalBody") 
-                        p Test
                     div.modal-footer
                         button.btn.btn-default(data-dismiss="modal") Close
 

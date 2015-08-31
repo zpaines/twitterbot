@@ -7,7 +7,7 @@
 5 error     <http://github.com/isaacs/npm/issues>
 5 error or email it to:
 5 error     <npm-@googlegroups.com>
-6 error System Linux 3.16.0-30-generic
+6 error System Linux 3.16.0-43-generic
 7 error command "/usr/bin/nodejs" "/usr/bin/npm" "start"
 8 error cwd /home/zach/Documents/test/views
 9 error node -v v0.10.25

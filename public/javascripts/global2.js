@@ -94,6 +94,7 @@ function getData(validIDs) {
     }).done(function(data) {
       $.each(data, function(){
           //if ($.inArray(this._id, validIDs) > -1) {
+            console.log(this);
             items.push(populateBox(this));
           //}
         });
@@ -146,7 +147,7 @@ function getData(validIDs) {
     for (var i=0; i<guideTimeslots[guideInfo._id].length; i++) {
       var slot = guideTimeslots[guideInfo._id][i];
       console.log(slot);
-      boxHTML += '<input type="radio" name="slotID" value = "' + slot._id + '">' + slot.time + ' on ' + slot.dateString + '<br>';
+      boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
     }
     boxHTML += '<div class="form-group">' + 
                '<label for="email">Email:</label>' + 

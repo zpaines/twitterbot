@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    var emailAddress = $('#guideEmailAddress').html();
+    console.log(emailAddress);
     console.log("test");
     var panels = $('.user-infos');
     var panelsButton = $('.dropdown-user');
@@ -7,13 +9,14 @@ $(document).ready(function() {
     var request = $.ajax({
        type: "GET",
        url: "/guidetimes",
-       data: {"guideEmail":"zpaines1@jhu.edu"}, // serializes the form's elements.
+       data: {"guideEmail":emailAddress}, // serializes the form's elements.
      });
     request.success(function(jqXHR, textStatus) {
         console.log("Test");
         $.each(request.responseJSON, function(index, value) {
             console.log(value);
-            $('timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.dateString + '</p>')
+            $('#timeslotModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + '</p>')
+            console.log("appended");
         });
     });
 

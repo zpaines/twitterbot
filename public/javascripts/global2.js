@@ -94,6 +94,7 @@ function getData(validIDs) {
     }).done(function(data) {
       $.each(data, function(){
           //if ($.inArray(this._id, validIDs) > -1) {
+            console.log(this);
             items.push(populateBox(this));
           //}
         });

@@ -8,6 +8,7 @@ var path = require('path');
 var randomstring = require('randomstring');
 
 var medic = require('../medic.js');
+var mailer = require('../mailer.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -98,12 +99,14 @@ router.put('/profile', medic.requireAuth, upload.single('guidePicture'), functio
 
 });
 
+// TODO(tfs): Cancel all appointments and timeslots
 router.delete('/profile', medic.requireAuth, function (req, res) {
   var db = req.db;
   var guides = db.get('guides');
 
   guides.remove({_id: req.user._id}, function (e, removed) {
     if (e) { return res.status(500).send({error:"Error accessing guides database"}); }
+    mailer.sendAccountDeletion(req.user);
     return res.status(200).send('OK');
   });
 });
@@ -224,11 +227,18 @@ router.delete('/timeslot', function (req, res) {
   }
 
   var db = req.db;
-  var timeslots = req.db.get('timeslots');
+  var timeslots = db.get('timeslots');
+  var appointments = db.get('appointments');
 
-  timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (err, removed) {
-    if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
-    return res.status(200).send('OK');
+  appointments.find({timeslotID: medic.sanitize(req.body.randomID)}, function (e, docs) {
+    if (docs.length > 0) {
+      return res.status(400).send({error:"Appointment currently scheduled for this timeslot"});
+    } else {
+      timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (err, removed) {
+        if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
+        return res.status(200).send('OK');
+      });
+    }
   });
 });
 
@@ -279,7 +289,8 @@ router.post('/appointment', function (req, res) {
 
         apts.insert(newApt, function (e, inserted) {
           if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
-          return res.status(200).send('OK'); // Send email
+          mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time);
+          return res.status(200).send('OK');
         });
       });
     });
@@ -352,9 +363,16 @@ router.delete('/appointment/:id', function (req, res) {
 
   var cleanID = medic.sanitize(req.params.id);
 
-  appointments.remove({randomID: cleanID}, function (err, records) {
-    if (err) { return res.status(500).send({error: "Error with appointment lookup"}); }
-    return res.status(200).send('OK');
+  appointments.find({randomID: cleanID}, function (e, docs) {
+    if ((e) || (docs.length == 0) || (docs.length > 1)) {
+      return res.status(500).send({error:"Error looking up appointments"});
+    }
+
+    appointments.remove({randomID: cleanID}, function (err, records) {
+      if (err) { return res.status(500).send({error: "Error with appointment lookup"}); }
+      mailer.sendAppointmentCancelation(docs[0].responseEmail, docs[0].guideEmail, docs[0].date, docs[0].time);
+      return res.status(200).send('OK');
+    });
   });
 });
 

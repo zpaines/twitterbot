@@ -47,9 +47,10 @@ router.get('/guidelist', function(req,res) {
   });
 });
 
+// NOTE(tfs): should probably sanitize most of this again
 router.get('/profile', medic.requireAuth, function(req, res) {
   res.render('profile', {
-    id: req.user._id,
+    // id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
@@ -58,14 +59,47 @@ router.get('/profile', medic.requireAuth, function(req, res) {
   });
 });
 
-router.get('/edit', medic.requireAuth, function(req, res) {
+router.get('/edit', medic.requireAuth, function (req, res) {
   res.render('edit', {
-    id: req.user._id,
+    // id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
     language: req.user.language,
     photoPath: req.user.photoPath
+  });
+});
+
+router.put('/profile', medic.requireAuth, function (req, res) {
+  var updatedFields = [];
+
+  var potentialFields = ['name', 'email', 'major', 'language']; // No support for new pictures right now
+
+  var toUpdate = req.user;
+
+  for (var i = 0; i < potentialFields.length; i++) {
+    if (potentialFields[i] in req.body) {
+      toUpdate[potentialFields[i]] = req.body[potentialFields[i]];
+    }
+  }
+
+  var db = req.db;
+  var guides = db.get('guides');
+
+  guides.update({_id: req.user._id}, toUpdate, function (err, doc) {
+    if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
+    return res.status(200).send('OK');
+  });
+
+});
+
+router.delete('/profile', medic.requireAuth, function (req, res) {
+  var db = req.db;
+  var guides = db.get('guides');
+
+  guides.remove({_id: req.user._id}, function (e, removed) {
+    if (e) { return res.status(500).send({error:"Error accessing guides database"}); }
+    return res.status(200).send('OK');
   });
 });
 
@@ -178,6 +212,22 @@ router.get('/guidetimes', function(req, res) {
   }
 });
 
+router.delete('/timeslot', function (req, res) {
+  var errorMessage = '';
+  errorMessage = medic.checkKeys(req.body, ['randomID']);
+
+  if (errorMessage != '') {
+    return res.status(400).send({error:"Note enough fields specified"});
+  }
+
+  var db = req.db;
+  var timeslots = req.db.get('timeslots');
+
+  timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (e, removed) {
+    if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
+    return res.status(200).send('OK');
+  });
+});
 
 router.get('/newapt', function (req, res) {
   res.render('makeapt');

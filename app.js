@@ -106,15 +106,7 @@ app.use(function(req,res,next) {
     next();
 });
 
-// // Cross-origin
-// app.use(function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//     next();
-// });
-
 app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
-  console.log(req.body);
   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
   if (errorMessage != '') {
@@ -129,6 +121,10 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
 
   if (p1 != p2) {
     errorMessage += "Passwords do not match;";
+  }
+
+  if ((req.file == undefined) || (req.file.filename == undefined)) {
+    errorMessage += "No picture provided;";
   }
 
   if (errorMessage == '') {
@@ -152,17 +148,19 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
           if (!err) {
             req.logIn(inserted, function (err) {
               if (err) {
-                res.status(500).send({error: 'Error logging in new user; User saved.'});
+                return res.status(500).send({error: 'Error logging in new user; User saved.'});
               } else {
-                res.redirect('/profile');
+                return res.redirect('/profile');
               }
             });
           } else {
-            res.status(500).send({error: 'Error saving new user.'});
+            return res.status(500).send({error: 'Error saving new user.'});
           }
         });
       }
     });
+  } else {
+    return res.status(400).send({error:errorMessage});
   }
 });
 

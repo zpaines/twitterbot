@@ -70,12 +70,17 @@ router.get('/edit', medic.requireAuth, function (req, res) {
   });
 });
 
-router.put('/profile', medic.requireAuth, function (req, res) {
+router.put('/profile', medic.requireAuth, upload.single('guidePicture'), function (req, res) {
   var updatedFields = [];
 
-  var potentialFields = ['name', 'email', 'major', 'language']; // No support for new pictures right now
+  var potentialFields = ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage'];
 
   var toUpdate = req.user;
+
+  if ((req.file) && (req.file.filename)) {
+    var filePath = '/picture/' + medic.sanitize(req.file.filename);
+    toUpdate.photoPath = filePath;
+  }
 
   for (var i = 0; i < potentialFields.length; i++) {
     if (potentialFields[i] in req.body) {
@@ -158,7 +163,6 @@ router.get('/times', function(req, res) {
         var newTime = {
           date: medic.sanitize(doc.date),
           time: medic.sanitize(doc.time),
-          duration: medic.sanitize(doc.duration),
           guideEmail: medic.sanitize(doc.guideEmail),
           randomID: medic.sanitize(doc.randomID)
         }
@@ -196,7 +200,6 @@ router.get('/guidetimes', function(req, res) {
           var newTime = {
             date: medic.sanitize(doc.date),
             time: medic.sanitize(doc.time),
-            duration: medic.sanitize(doc.duration),
             guideEmail: medic.sanitize(doc.guideEmail),
             randomID: medic.sanitize(doc.randomID)
           }
@@ -257,12 +260,16 @@ router.post('/appointment', function (req, res) {
       var cleanGuideEmail = medic.sanitize(String(guide.email));
       var cleanEmail = medic.sanitize(String(req.body.responseEmail));
       var cleanRandomID = medic.sanitize(medic.hashOther(randomstring.generate(40)));
+      var cleanStartDate = medic.sanitize(String(slot.date));
+      var cleanStartTime = medic.sanitize(String(slot.time));
 
       var newApt = {
         timeslotID: cleanSlotID,
         guideEmail: cleanGuideEmail,
         responseEmail: cleanEmail,
-        randomID: cleanRandomID
+        randomID: cleanRandomID,
+        date: cleanStartDate,
+        time: cleanStartTime
       }
 
       apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
@@ -297,7 +304,9 @@ router.get('/appointment/:id', function (req, res) {
         guideID: medic.sanitize(doc.guideID),
         guideEmail: medic.sanitize(doc.guideEmail),
         responseEmail: medic.sanitize(doc.responseEmail),
-        randomID: medic.sanitize(doc.randomID)
+        randomID: medic.sanitize(doc.randomID),
+        date: medic.sanitize(doc.date),
+        time: medic.sanitize(doc.time)
       }
 
       toReturn.push(newApt);
@@ -325,7 +334,9 @@ router.get('/appointments', medic.requireAuth, function (req, res) {
         timeslotID: medic.sanitize(doc.timeslotID),
         guideEmail: medic.sanitize(doc.guideEmail),
         responseEmail: medic.sanitize(doc.responseEmail),
-        randomID: medic.sanitize(doc.randomID)
+        randomID: medic.sanitize(doc.randomID),
+        date: medic.sanitize(doc.date),
+        time: medic.sanitize(doc.time)
       }
 
       toReturn.push(newApt);

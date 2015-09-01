@@ -7,7 +7,16 @@ $(document).ready(function() {
     updateAppointmentModal();
 
     $('.modal').on("click", '.timeslotDeleteButton', function() {
-      console.log(this.id);
+        var request = $.ajax({
+           type: "DELETE",
+           url: "/timeslot",
+           data: {"randomID":this.id} // serializes the form's elements.
+         });
+        request.complete(function(jqXHR, textStatus) {
+            if (jqXHR.status == 200) {
+                updateTimeslotModal();
+            }
+        });
     });
 
     $('.modal').on("click", '#newTimeslotButton', function() {

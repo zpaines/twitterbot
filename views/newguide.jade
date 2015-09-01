@@ -41,21 +41,20 @@ block content
                                         tr
                                             td Password:
                                             td
-                                                input(type="password", name="guidePassword" placeholder="Password", class="form-control") 
+                                                input(type="password", name="guidePassword" id="password" placeholder="Password", class="form-control") 
                                         tr
                                             td
                                             td
-                                                input(type="password", name="guidePasswordConfirm" placeholder="Confirm Password", class="form-control")                     
+                                                input(type="password", name="guidePasswordConfirm" id="passwordConfirm" placeholder="Confirm Password", class="form-control")                     
                                                    
                     div.panel-footer
-                        span.pull-right
                             a.btn.btn-sm.btn-danger(data-original-title="Cancel" data-toggle="tooltip" type="button" href="/guideLogin")
                                 i Cancel
-                            span  
-                            button.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="submitButton btnSubmit" action="/guideSignup")
-                                i.glyphicon.glyphicon-ok
+                            span.pull-right  
+                                button.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="submitButton btnSubmit" action="/guideSignup")
+                                    i.glyphicon.glyphicon-ok
 
     script(src="/js/jquery.js")
     script(src="/js/bootstrap.min.js")
-    script(src="/javascripts/profile.js")
+    script(src="/javascripts/newguide.js")
 

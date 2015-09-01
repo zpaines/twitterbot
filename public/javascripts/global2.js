@@ -70,8 +70,8 @@ function filterGuidesDate() {
     if (timeslots[i]) {
       console.log(i);
       for (var z = 0; z<timeslots[i].length; z++) {
-        validID.push(timeslots[i][z].guideID);
-        console.log(timeslots[i][z].guideID);
+        validID.push(timeslots[i][z].guideEmail);
+        console.log(timeslots[i][z].guideEmail);
         console.log(validID);
       }
     }
@@ -115,12 +115,16 @@ function getData(validIDs) {
 	boxHTML += '';
 	boxHTML += '</li>';*/
 
+  guideInfo.emailString = guideInfo.email;
+  guideInfo.emailString = guideInfo.emailString.replace("@", "");
+  guideInfo.emailString = guideInfo.emailString.replace(".", "");
+  console.log(guideInfo.emailString);
 	boxHTML =  '<li class="col-sm-4">' +
   '<div class="team-member">' +
   '<img src=' +  guideInfo.photoPath + ' class="img-responsive img-circle" alt="">' +
   '<h4>' + guideInfo.name + '</h4>' +
   '<p class="text-muted">' + guideInfo.major + '</p>' +
-  '<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal' + guideInfo._id + '">' + 
+  '<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal' + guideInfo.emailString + '">' + 
   'Make Appointment' +
   '</button>' + '<br> <br>' +
   '<ul class="list-inline social-buttons"> ' +
@@ -131,7 +135,7 @@ function getData(validIDs) {
   '</div>' +
   '</li>' +
 
-  '<div class="modal fade" id="myModal' + guideInfo._id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
+  '<div class="modal fade" id="myModal' + guideInfo.emailString + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
   '<div class="modal-dialog" role="document">' + 
   '<div class="modal-content">' +
   '<div class="modal-header">' +
@@ -140,12 +144,12 @@ function getData(validIDs) {
   '</div>'+
   '<form action="/appointment" method="post">' +
   '<div class="modal-body">' +
-  'Make Appointment With ' + guideInfo.major +
+  'Make Appointment With ' + guideInfo.name +
   '<br>Possible Times are: <br>';
-  console.log(guideTimeslots[guideInfo._id]);
-  if (guideTimeslots[guideInfo._id]) {
-    for (var i=0; i<guideTimeslots[guideInfo._id].length; i++) {
-      var slot = guideTimeslots[guideInfo._id][i];
+  console.log(guideTimeslots[guideInfo.email]);
+  if (guideTimeslots[guideInfo.email]) {
+    for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
+      var slot = guideTimeslots[guideInfo.email][i];
       console.log(slot);
       boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
     }
@@ -178,10 +182,10 @@ function getTimeslots() {
   }).done(function(data) {
     $.each(data, function(){
       this.dateString = this.date;
-      if (!guideTimeslots[this.guideID]) {
-        guideTimeslots[this.guideID] = [];
+      if (!guideTimeslots[this.guideEmail]) {
+        guideTimeslots[this.guideEmail] = [];
       }
-      guideTimeslots[this.guideID].push(this);
+      guideTimeslots[this.guideEmail].push(this);
 
       this.date = this.date.split('-').join('');
       if (!timeslots[parseInt(this.date)]) {

@@ -28,6 +28,8 @@ block content
                                         td Language:
                                         td #{language}                        
                             button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
+                            span &nbsp&nbsp
+                            button.btn.btn-primary(data-toggle="modal" data-target="#appointmentModal") My Appointments
                 div.panel-footer
                     a.btn.btn-sm.btn-danger(href="/logout" data-original-title="Broadcast Message" data-toggle="tooltip" type="button")
                         i Logout
@@ -41,7 +43,29 @@ block content
                         button.close(time="button" data-dismiss="modal" aria-label="Close")
                             span(aria-hidden="true") &times;
                         h4.modal-title(id="myModalLabel") Timeslots
-                    div.modal-body(id="timeslotModalBody") 
+                    div.modal-body(id="timeslotModalBody")
+                        div#currentSlots
+                        br
+                        br
+                        div.row#addNewSlot
+                            form#newTimeslotForm(name="newtimeslot")
+                                div.form-group.col-xs-4
+                                    input#newTimeslotDate(type="date", name="date" class="form-control")
+                                div.form-group.col-xs-4
+                                    input#newTimeslotTime(type="time", name="time" step="900" class="form-control")
+                                div.form-group.col-xs-4
+                                    a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="newTimeslotButton")
+                                        i.glyphicon.glyphicon-plus-sign
+                    div.modal-footer
+                        button.btn.btn-default(data-dismiss="modal") Close
+        div.modal.fade(id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+            div.modal-dialog(role="document")
+                div.modal-content
+                    div.modal-header
+                        button.close(time="button" data-dismiss="modal" aria-label="Close")
+                            span(aria-hidden="true") &times;
+                        h4.modal-title(id="myModalLabel") Appointments
+                    div.modal-body(id="appointmentModalBody")
                     div.modal-footer
                         button.btn.btn-default(data-dismiss="modal") Close
 

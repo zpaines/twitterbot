@@ -226,7 +226,7 @@ router.delete('/timeslot', function (req, res) {
   var db = req.db;
   var timeslots = req.db.get('timeslots');
 
-  timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (e, removed) {
+  timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (err, removed) {
     if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
     return res.status(200).send('OK');
   });

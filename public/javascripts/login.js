@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$("#loginForm").submit(function() {
 		var request = $.ajax({
            type: "POST",
-           url: "/login",
+           url: "/timeslot",
            data: $("#loginForm").serialize(), // serializes the form's elements.
          });
 		request.complete(function(jqXHR, textStatus) {

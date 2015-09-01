@@ -128,7 +128,8 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   var p2 = medic.hashPass(raw2);
 
   if (p1 != p2) {
-    errorMessage += "Passwords do not match;";
+    res.status(500).send({error: 'Error Passwords Don\'t match'});
+    return;
   }
 
   if (errorMessage == '') {

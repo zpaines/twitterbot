@@ -22,6 +22,7 @@
     "passport": "latest",
     "passport-local": "latest",
     "js-sha512": "latest",
-    "randomstring": "latest"
+    "randomstring": "latest",
+    "nodemailer": "latest"
   }
 }

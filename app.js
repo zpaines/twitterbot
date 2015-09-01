@@ -6,9 +6,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var medic = require('./medic.js');
+var mailer = require('./mailer.js');
 var multer = require('multer');
 var photoPath = "uploads/";
 var upload = multer({dest: photoPath});
+var randomstring = require('randomstring');
 
 // Auth packages
 var session = require('express-session');
@@ -32,7 +34,6 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 
 // Setup Sessions and Passport
 var dbSettings = {}
@@ -67,7 +68,11 @@ passport.use(new LocalStrategy({
         return done(null, false, { message: 'Incorrect username' });
       } else if (data.length == 1) {
         if (medic.validateUser(data[0], password)) {
-          return done(null, data[0]);
+          if (data[0].isActivated == true) {
+            return done(null, data[0]);
+          } else {
+            return done(null, false, { message: 'Requires admin approval' })
+          }
         } else {
           return done(null, false, { message: 'Incorrect password' });
         }
@@ -119,6 +124,8 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
   var p1 = medic.hashPass(raw1);
   var p2 = medic.hashPass(raw2);
 
+  var randomID = randomstring.generate(30);
+
   if (p1 != p2) {
     res.status(500).send({error: 'Error Passwords Don\'t match'});
     return;
@@ -132,9 +139,10 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
     var db = req.db;
     var guides = db.get('guides');
 
-    guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
+    // guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
+    guides.find({ email: "pleasedon'tbereal" }, function (error, docs) {
       if (docs.length > 0) {
-        res.json({ error: "That username exists already." });
+        return res.json({ error: "That username exists already." });
       } else {
         var newGuide = {
           name: medic.sanitize(req.body.guideName),
@@ -142,18 +150,16 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
           major: medic.sanitize(req.body.guideMajor),
           language: medic.sanitize(req.body.guideLanguage),
           photoPath: '/picture/' + medic.sanitize(req.file.filename),
-          hashedPassword: p1
+          hashedPassword: p1,
+          hashedRandomID: medic.hashOther(randomID),
+          isActivated: false
         };
 
         guides.insert(newGuide, function (err, inserted) {
           if (!err) {
-            req.logIn(inserted, function (err) {
-              if (err) {
-                return res.status(500).send({error: 'Error logging in new user; User saved.'});
-              } else {
-                return res.redirect('/profile');
-              }
-            });
+            mailer.sendGuideSignup(newGuide, randomID);
+            // return res.redirect('/');
+            return res.send('blech');
           } else {
             return res.status(500).send({error: 'Error saving new user.'});
           }
@@ -164,11 +170,6 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
     return res.status(400).send({error:errorMessage});
   }
 });
-
-// app.post('/login', passport.authenticate('local', {
-//   successRedirect: '/profile',
-//   failureRedirect: '/guidelogin'
-// }));
 
 // From passport's site
 app.post('/login', function(req, res, next) {
@@ -187,6 +188,34 @@ app.get('/logout', function (req, res) {
     req.logout();
   }
   res.redirect('/guideLogin');
+});
+
+app.get('/admin/activate/:email/:secret', function (req, res) {
+  secretID = medic.sanitize(req.params.secret);
+  cleanEmail = medic.sanitize(req.params.email);
+
+  var db = req.db;
+  var guides = db.get('guides');
+
+  guides.find({email: cleanEmail}, function (err, docs) {
+    if (docs.length > 1) {
+      return res.status(400).send({error: "Multiple entries with specified email found"});
+    } else if (docs.length == 0) {
+      return res.status(400).send({error: "No entries with specified email found"});
+    } else {
+      if (medic.hashOther(secretID) != docs[0].hashedRandomID) {
+        return res.status(400).send({error: "Invalid secret ID"});
+      } else {
+        newGuide = docs[0];
+        newGuide.isActivated = true;
+        guides.insert({email: cleanEmail}, newGuide, function (e, doc) {
+          if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
+          mailer.sendGuideActivation(docs[0]);
+          return res.status(200).send('Account Activated');
+        });
+      }
+    }
+  });
 });
 
 app.use('/', routes);

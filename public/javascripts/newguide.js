@@ -17,11 +17,9 @@ function checkPasswordMatch() {
     	$("#passwordConfirm").css("border", border);
     	return false;
     } else if (password != confirmPassword) {
-        console.log("No Match");
     	$("#passwordConfirm").css("border", "1px solid red");
     	return false;
     } else {
-        console.log("Match");
     	$("#passwordConfirm").css("border", "1px solid green");
     	return true;
     }

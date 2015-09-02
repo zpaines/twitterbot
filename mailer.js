@@ -51,6 +51,9 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 }
 
 exports.sendGuideSignup = function (guideObject, secretID) {
+	console.log('-------');
+	console.log(secretID);
+	console.log('-------');
 	var adminOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,

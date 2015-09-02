@@ -152,10 +152,16 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
 
         guides.insert(newGuide, function (err, inserted) {
           if (!err) {
-            mailer.sendGuideSignup(newGuide, randomID);
-            return res.redirect('/');
+            req.logIn(inserted, function (err) {
+              if (err) {
+                return res.status(500).send({error: 'Error logging in new user; User saved.'});
+              } else {
+                mailer.sendGuideSignup(newGuide, randomID);
+                return res.redirect('/profile');
+              }
+            });
           } else {
-            return res.status(500).send({error: 'Error saving new user.'});
+            return res.status(500).send({error: 'Could not save account information'});
           }
         });
       }
@@ -198,11 +204,12 @@ app.get('/admin/activate/:email/:secret', function (req, res) {
       return res.status(400).send({error: "No entries with specified email found"});
     } else {
       if (medic.hashOther(secretID) != docs[0].hashedRandomID) {
-        return res.status(400).send({error: "Invalid secret ID"});
+        return res.status(215).send({error: "Invalid secret ID"});
       } else {
         newGuide = docs[0];
+        console.log(newGuide);
         newGuide.isActivated = true;
-        guides.insert({email: cleanEmail}, newGuide, function (e, doc) {
+        guides.update({email: cleanEmail}, newGuide, function (e, doc) {
           if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
           mailer.sendGuideActivation(docs[0]);
           return res.status(200).send('Account Activated');

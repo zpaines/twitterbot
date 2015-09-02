@@ -140,7 +140,7 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
     var guides = db.get('guides');
 
     // guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
-    guides.find({ email: "pleasedon'tbereal" }, function (error, docs) {
+    guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
       if (docs.length > 0) {
         return res.json({ error: "That username exists already." });
       } else {
@@ -158,8 +158,7 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
         guides.insert(newGuide, function (err, inserted) {
           if (!err) {
             mailer.sendGuideSignup(newGuide, randomID);
-            // return res.redirect('/');
-            return res.send('blech');
+            return res.redirect('/');
           } else {
             return res.status(500).send({error: 'Error saving new user.'});
           }

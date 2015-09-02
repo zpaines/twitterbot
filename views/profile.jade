@@ -18,6 +18,11 @@ block content
                         div.col-md-9.col-lg-9 
                             table.table.table-user-information
                                 tbody
+                                    if (isActivated != true)
+                                        tr
+                                            td Activated:
+                                            td
+                                                font(id="guideActivated" color="red") No
                                     tr
                                         td Email:
                                         td(id="guideEmailAddress") #{email}
@@ -26,48 +31,50 @@ block content
                                         td #{major}   
                                     tr
                                         td Language:
-                                        td #{language}                        
-                            button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
-                            span &nbsp&nbsp
-                            button.btn.btn-primary(data-toggle="modal" data-target="#appointmentModal") My Appointments
+                                        td #{language}
+                            if (isActivated == true)                        
+                                button.btn.btn-primary(data-toggle="modal" data-target="#timeslotModal") My Timeslots
+                                span &nbsp&nbsp
+                                button.btn.btn-primary(data-toggle="modal" data-target="#appointmentModal") My Appointments
                 div.panel-footer
                     a.btn.btn-sm.btn-danger(href="/logout" data-original-title="Broadcast Message" data-toggle="tooltip" type="button")
                         i Logout
                     span.pull-right
                         a.btn.btn-sm.btn-warning(href="edit" data-original-title="Edit this user" data-toggle="tooltip" type="button")
                             i.glyphicon.glyphicon-edit
-        div.modal.fade(id="timeslotModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-            div.modal-dialog(role="document")
-                div.modal-content
-                    div.modal-header
-                        button.close(time="button" data-dismiss="modal" aria-label="Close")
-                            span(aria-hidden="true") &times;
-                        h4.modal-title(id="myModalLabel") Timeslots
-                    div.modal-body(id="timeslotModalBody")
-                        div#currentSlots
-                        br
-                        br
-                        div.row#addNewSlot
-                            form#newTimeslotForm(name="newtimeslot")
-                                div.form-group.col-xs-4
-                                    input#newTimeslotDate(type="date", name="date" class="form-control")
-                                div.form-group.col-xs-4
-                                    input#newTimeslotTime(type="time", name="time" step="900" class="form-control")
-                                div.form-group.col-xs-4
-                                    a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="newTimeslotButton")
-                                        i.glyphicon.glyphicon-plus-sign
-                    div.modal-footer
-                        button.btn.btn-default(data-dismiss="modal") Close
-        div.modal.fade(id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-            div.modal-dialog(role="document")
-                div.modal-content
-                    div.modal-header
-                        button.close(time="button" data-dismiss="modal" aria-label="Close")
-                            span(aria-hidden="true") &times;
-                        h4.modal-title(id="myModalLabel") Appointments
-                    div.modal-body(id="appointmentModalBody")
-                    div.modal-footer
-                        button.btn.btn-default(data-dismiss="modal") Close
+        if (isActivated == true)
+            div.modal.fade(id="timeslotModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+                div.modal-dialog(role="document")
+                    div.modal-content
+                        div.modal-header
+                            button.close(time="button" data-dismiss="modal" aria-label="Close")
+                                span(aria-hidden="true") &times;
+                            h4.modal-title(id="myModalLabel") Timeslots
+                        div.modal-body(id="timeslotModalBody")
+                            div#currentSlots
+                            br
+                            br
+                            div.row#addNewSlot
+                                form#newTimeslotForm(name="newtimeslot")
+                                    div.form-group.col-xs-4
+                                        input#newTimeslotDate(type="date", name="date" class="form-control")
+                                    div.form-group.col-xs-4
+                                        input#newTimeslotTime(type="time", name="time" step="900" class="form-control")
+                                    div.form-group.col-xs-4
+                                        a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="newTimeslotButton")
+                                            i.glyphicon.glyphicon-plus-sign
+                        div.modal-footer
+                            button.btn.btn-default(data-dismiss="modal") Close
+            div.modal.fade(id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+                div.modal-dialog(role="document")
+                    div.modal-content
+                        div.modal-header
+                            button.close(time="button" data-dismiss="modal" aria-label="Close")
+                                span(aria-hidden="true") &times;
+                            h4.modal-title(id="myModalLabel") Appointments
+                        div.modal-body(id="appointmentModalBody")
+                        div.modal-footer
+                            button.btn.btn-default(data-dismiss="modal") Close
 
     script(src="/js/jquery.js")
     script(src="/js/bootstrap.min.js")

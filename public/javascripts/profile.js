@@ -3,8 +3,12 @@ $(document).ready(function() {
     var panelsButton = $('.dropdown-user');
     panels.hide();
 
-    updateTimeslotModal();
-    updateAppointmentModal();
+    if ($('#guideActivated').html() != "No") {
+        updateTimeslotModal();
+        updateAppointmentModal();
+    }
+
+    //console.log($('#guideActivated').html());
 
     $('.modal').on("click", '.timeslotDeleteButton', function() {
         var request = $.ajax({
@@ -15,6 +19,18 @@ $(document).ready(function() {
         request.complete(function(jqXHR, textStatus) {
             if (jqXHR.status == 200) {
                 updateTimeslotModal();
+            }
+        });
+    });
+
+    $('.modal').on("click", '.appointmentCancelButton', function() {
+        var request = $.ajax({
+           type: "DELETE",
+           url: "/appointment/" + this.id,
+         });
+        request.complete(function(jqXHR, textStatus) {
+            if (jqXHR.status == 200) {
+                updateAppointmentModal();
             }
         });
     });
@@ -86,8 +102,9 @@ function updateAppointmentModal() {
      });
     request.success(function(jqXHR, textStatus) {
         console.log("Test");
+        $("#appointmentModalBody").empty();
         $.each(request.responseJSON, function(index, value) {
-            console.log(value);
+            $('#appointmentModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + ' with ' + value.responseEmail + '&nbsp &nbsp <a class="btn btn-sm btn-danger appointmentCancelButton" id="' + value.randomID +'" data-original-title="Cancle This Appointment" data-toggle="tooltip" type="button"> <i>Cancel</i> </a> </p>')
         });
     });
 }

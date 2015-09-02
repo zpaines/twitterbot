@@ -38,7 +38,7 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 	var mailOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: recipientString,
-		subject: "Appointment Scheduled",
+		subject: "Appointment Canceled",
 		text: "HI",
 		html: "<html>HI</html>"
 	}
@@ -59,7 +59,7 @@ exports.sendGuideSignup = function (guideObject, secretID) {
 		to: process.env.ADMINEMAIL,
 		subject: "Guide Registration",
 		text: "Hi",
-		html: "<html>Hi <br> <a href=localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + "> Activate Profile </a></html>"
+		html: "<html>Hi <br> <a href=http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + "> Activate Profile </a></html>"
 	}
 
 	var guideOptions = {

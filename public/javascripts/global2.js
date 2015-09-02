@@ -93,10 +93,10 @@ function getData(validIDs) {
       error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
     }).done(function(data) {
       $.each(data, function(){
-          //if ($.inArray(this._id, validIDs) > -1) {
+          if ($.inArray(this.email, validIDs) > -1) {
             console.log(this);
             items.push(populateBox(this));
-          //}
+          }
         });
       console.log(items);
       $('#team_list').html(items.join("\n"));

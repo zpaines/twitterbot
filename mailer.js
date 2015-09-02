@@ -20,8 +20,8 @@ exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, tim
 		from: "College Connect JHU <collegeconnectjhu@gmail.com>",
 		to: recipientString,
 		subject: "Appointment Scheduled",
-		text: "HI",
-		html: "<html>HI</html>"
+		text: "Hi! You have an new guide appointment on " + date " at " + time + ". We're looking forward to seeing you!",
+		html: "<html>Hi! You have an new guide appointment on " + date " at " + time + ". We're looking forward to seeing you!</html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {
@@ -39,8 +39,8 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: recipientString,
 		subject: "Appointment Canceled",
-		text: "HI",
-		html: "<html>HI</html>"
+		text: "Hello. Unfortunately your appointment for " + date + " at " + time + " has been canceled.",
+		html: "<html>Hello. Unfortunately your appointment for " + date + " at " + time + " has been canceled. </html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {
@@ -58,8 +58,8 @@ exports.sendGuideSignup = function (guideObject, secretID) {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,
 		subject: "Guide Registration",
-		text: "Hi",
-		html: "<html>Hi <br> <a href=http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + "> Activate Profile </a></html>"
+		text: "Hi. " + guideObject.name +" has requested to be registered as a guide. \n Their email address is " + guideObject.email + " and their major is " + guideObject.major +". \n http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + " Click Here to Activate Their Profile",
+		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> <a href=http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + "> Click Here to Activate Their Profile </a></html>"
 	}
 
 	var guideOptions = {
@@ -67,7 +67,7 @@ exports.sendGuideSignup = function (guideObject, secretID) {
 		to: guideObject.email,
 		subject: "Registration Confirmation",
 		text: "Thank you for applying, please wait for an admin to activate your account",
-		html: "<html>Hi</html>"
+		html: "<html>Thanks for applying to be a guide! Please wait for an admin to activate your account. You'll receive an email when that happens. </html>"
 	}
 
 	transporter.sendMail(adminOptions, function (error, info) {
@@ -89,7 +89,7 @@ exports.sendGuideActivation = function (guideObject) {
 		to: guideObject.email,
 		subject: "Account Activated",
 		text: "Hi",
-		html: "<html>Hi</html>"
+		html: "<html>Hi + " guideObject.name "! Your account has been activated. Get started at http://localhost:3000/profile </html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {

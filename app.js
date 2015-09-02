@@ -68,11 +68,7 @@ passport.use(new LocalStrategy({
         return done(null, false, { message: 'Incorrect username' });
       } else if (data.length == 1) {
         if (medic.validateUser(data[0], password)) {
-          if (data[0].isActivated == true) {
-            return done(null, data[0]);
-          } else {
-            return done(null, false, { message: 'Requires admin approval' })
-          }
+          return done(null, data[0]);
         } else {
           return done(null, false, { message: 'Incorrect password' });
         }
@@ -139,7 +135,6 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
     var db = req.db;
     var guides = db.get('guides');
 
-    // guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
     guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
       if (docs.length > 0) {
         return res.json({ error: "That username exists already." });
@@ -173,11 +168,11 @@ app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
 // From passport's site
 app.post('/login', function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err); }
-    if (!user) { return res.status(215).send({error:'Not authorized'}); }
+    if (err) { console.log('a'); return next(err); }
+    if (!user) { console.log('b'); return res.status(215).send({error:'Not authorized'}); }
     req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      res.status(200).send('OK');
+      if (err) { console.log('c'); return next(err); }
+      console.log('d'); return res.status(200).send('OK');
     });
   })(req, res, next);
 });

@@ -41,3 +41,13 @@ exports.requireAuth = function (req, res, next) {
 		return next();
 	}
 }
+
+exports.requireActivation = function (req, res, next) {
+	if ((req.user) && (req.user.isActivated)) {
+		return next();
+	} else if (req.isAuthenticated()) {
+		return res.status(403).redirect('/profile');
+	} else {
+		return res.status(403).redirect('/guideLogin');
+	}
+}

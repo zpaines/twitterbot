@@ -23,7 +23,7 @@ router.get(photoURL + ':filePath', function(req,res) {
     res.sendFile(path.resolve(photoPath + req.params.filePath));
 });
 
-router.post('/upload', upload.single('file'), function(req, res) {});
+// router.post('/upload', upload.single('file'), function(req, res) {});
 
 router.get('/guidelist', function(req,res) {
   var db = req.db;
@@ -51,23 +51,23 @@ router.get('/guidelist', function(req,res) {
 // NOTE(tfs): should probably sanitize most of this again
 router.get('/profile', medic.requireAuth, function(req, res) {
   res.render('profile', {
-    // id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
     language: req.user.language,
-    photoPath: req.user.photoPath
+    photoPath: req.user.photoPath,
+    isActivated: req.user.isActivated
   });
 });
 
 router.get('/edit', medic.requireAuth, function (req, res) {
   res.render('edit', {
-    // id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
     language: req.user.language,
-    photoPath: req.user.photoPath
+    photoPath: req.user.photoPath,
+    isActivated: req.user.isActivated
   });
 });
 
@@ -119,7 +119,7 @@ router.get('/guidelogin', function(req, res) {
   res.render('guideLogin', {title: 'Log in'});
 });
 
-router.post('/timeslot', medic.requireAuth, function(req, res) {
+router.post('/timeslot', medic.requireAuth, medic.requireActivation, function(req, res) {
   var errorMessage = '';
   errorMessage = medic.checkKeys(req.body, ['date', 'time']);
   
@@ -180,7 +180,7 @@ router.get('/times', function(req, res) {
   });
 });
 
-router.get('/newtime', medic.requireAuth, function(req, res) {
+router.get('/newtime', medic.requireAuth, medic.requireActivation, function(req, res) {
   res.render('newtime');
 });
 
@@ -218,7 +218,7 @@ router.get('/guidetimes', function(req, res) {
   }
 });
 
-router.delete('/timeslot', function (req, res) {
+router.delete('/timeslot', medic.requireAuth, medic.requireActivation, function (req, res) {
   var errorMessage = '';
   errorMessage = medic.checkKeys(req.body, ['randomID']);
 
@@ -234,9 +234,13 @@ router.delete('/timeslot', function (req, res) {
     if (docs.length > 0) {
       return res.status(400).send({error:"Appointment currently scheduled for this timeslot"});
     } else {
-      timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (err, removed) {
-        if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
-        return res.status(200).send('OK');
+      timeslots.find({randomID: medic.sanitize(req.body.randomID)}, function (er, docs) {
+        if (docs.length != 1) { return res.status(400).send({error:"Could not find timeslot to delete"}); }
+        if (docs[0].guideEmail != req.user.email) { return res.status(403).send({error:"Not authorized to delete this timeslot"}); }
+        timeslots.remove({randomID: medic.sanitize(req.body.randomID)}, {}, function (err, removed) {
+          if (err) { return res.status(500).send({error: "Error with timeslot lookup"}); }
+          return res.status(200).send('OK');
+        });
       });
     }
   });

@@ -1,7 +1,15 @@
 $(document).ready(function() {
     
-    $('#submitButton').click(function() {
-      data = "";
+    $('#submitButton').click(submitEdit);
+    $('#infoBody').keydown(function(e) {
+        if (e.keyCode == 13) {
+            submitEdit();
+        }
+    });
+});
+
+function submitEdit() {
+    data = "";
       if ($('#guidePicture').val()) {
         data += "guidePicture=" +$('#guidePicture').val() + "&";
       }
@@ -22,13 +30,10 @@ $(document).ready(function() {
         request.complete(function(jqXHR, textStatus) {
             if (jqXHR.success) {
                 console.log(jqXHR.status);
-                //window.location = "/profile";
+                window.location = "/profile";
             } else  {
                 alert("Could not update profile.");
             }
         });
-      } else {
-        console.log("no data");
-      }
-    });
-});
+      } 
+};

@@ -72,6 +72,7 @@ router.get('/edit', medic.requireAuth, function (req, res) {
 });
 
 router.put('/profile', medic.requireAuth, upload.single('guidePicture'), function (req, res) {
+  console.log(req.body);
   var updatedFields = [];
 
   var potentialFields = ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage'];
@@ -85,6 +86,7 @@ router.put('/profile', medic.requireAuth, upload.single('guidePicture'), functio
 
   for (var i = 0; i < potentialFields.length; i++) {
     if (potentialFields[i] in req.body) {
+      console.log("found one");
       toUpdate[potentialFields[i]] = req.body[potentialFields[i]];
     }
   }

@@ -122,16 +122,12 @@ function getData(validIDs) {
 	boxHTML =  '<li class="col-sm-4">' +
   '<div class="team-member">' +
   '<img src=' +  guideInfo.photoPath + ' class="img-responsive img-circle" alt="">' +
-  '<h4>' + guideInfo.name + '</h4>' +
-  '<p class="text-muted">' + guideInfo.major + '</p>' +
+  '<h4 style="margin:2">' + guideInfo.name + '</h4>' +
+  '<p class="text-muted" style="margin:0">' + guideInfo.major + '</p>' +
+  '<p class="text-muted" style="margin:0">' + guideInfo.language + '</p>' +
   '<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal' + guideInfo.emailString + '">' + 
   'Make Appointment' +
   '</button>' + '<br> <br>' +
-  '<ul class="list-inline social-buttons"> ' +
-  '<li><a href="#"><i class="fa fa-twitter"></i></a></li>' +
-  '<li><a href="#"><i class="fa fa-facebook"></i></a></li>'+
-  '<li><a href="#"><i class="fa fa-linkedin"></i></a></li>' +
-  '</ul>' +
   '</div>' +
   '</li>' +
 
@@ -140,7 +136,7 @@ function getData(validIDs) {
   '<div class="modal-content">' +
   '<div class="modal-header">' +
   '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-  '<h4 class="modal-title" id="myModalLabel">Modal title</h4>'+
+  '<h4 class="modal-title" id="myModalLabel">Make Appointment</h4>'+
   '</div>'+
   '<form action="/appointment" method="post">' +
   '<div class="modal-body">' +
@@ -154,8 +150,8 @@ function getData(validIDs) {
       boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
     }
     boxHTML += '<div class="form-group">' + 
-               '<label for="email">Email:</label>' + 
-               '<input type="text" class="form-control" name="responseEmail" id="email">' + 
+               //'<label for="email" style=" font-weight: normal !important">Your Email (a confirmation will be sent to you):</label>' + 
+               '<input type="text" class="form-control" name="responseEmail" id="email" placeholder = "Your Email (a confirmation will be sent to you)">' + 
                '</div>';
   }
 
@@ -163,7 +159,7 @@ function getData(validIDs) {
   boxHTML +='</div>' +
   '<div class="modal-footer">' +
   '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-  '<button type="button submit" class="btn btn-primary">Save changes</button>' +
+  '<button type="button submit" class="btn btn-primary">Schedule It!</button>' +
   '</form>' +
   '</div>' +
   '</div>' +

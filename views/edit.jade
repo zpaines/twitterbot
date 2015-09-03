@@ -22,11 +22,10 @@ block content
                                     tr
                                         td Photo:
                                         td
-                                            input(type="file", name="guidePicture" class="form-control")
+                                            input(type="file", id="guidePicture" name="guidePicture" class="form-control")
                                     tr
                                         td Email:
-                                        td
-                                            input(type="text" id="guideEmailAddress" placeholder="#{email}" class="form-control")
+                                        td(id="guideEmailAddress" style="text-align:Left") #{email}
                                     tr
                                         td Major:
                                         td  
@@ -43,9 +42,9 @@ block content
                         a.btn.btn-sm.btn-danger(data-original-title="Cancel" data-toggle="tooltip" type="button" href="/profile")
                             i Cancel
                         span  
-                        a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button" id="#submitButton")
+                        a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button" id="submitButton")
                             i.glyphicon.glyphicon-ok
 
     script(src="/js/jquery.js")
     script(src="/js/bootstrap.min.js")
-    script(src="/javascripts/profile.js")
+    script(src="/javascripts/edit.js")

@@ -20,8 +20,8 @@ exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, tim
 		from: "College Connect JHU <collegeconnectjhu@gmail.com>",
 		to: recipientString,
 		subject: "Appointment Scheduled",
-		text: "Hi! You have an new guide appointment on " + date " at " + time + ". We're looking forward to seeing you!",
-		html: "<html>Hi! You have an new guide appointment on " + date " at " + time + ". We're looking forward to seeing you!</html>"
+		text: "Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!",
+		html: "<html>Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!</html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {
@@ -89,7 +89,7 @@ exports.sendGuideActivation = function (guideObject) {
 		to: guideObject.email,
 		subject: "Account Activated",
 		text: "Hi",
-		html: "<html>Hi + " guideObject.name "! Your account has been activated. Get started at http://localhost:3000/profile </html>"
+		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at http://localhost:3000/profile </html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {

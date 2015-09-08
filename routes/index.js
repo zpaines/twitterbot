@@ -24,6 +24,42 @@ router.get(photoURL + ':filePath', function(req,res) {
 });
 
 // router.post('/upload', upload.single('file'), function(req, res) {});
+router.get('/appointmentInfo/:id', function (req, res) {
+  console.log("hit");
+
+
+  var db = req.db;
+  var appointments = db.get('appointments');
+
+  var cleanID = medic.sanitize(req.params.id);
+
+  appointments.find({randomID: cleanID}, function (err, docs) {
+    if (err) { return res.status(500).send({error: "Error with appointment lookup"}); }
+
+    var toReturn = [];
+
+    if (docs.length > 1) {
+      return res.status(500).send({error:"Conflicting IDs"});
+    } else if (docs.length < 1) {
+      return res.status(500).send({error:"Appointment Not Found"});
+    }
+
+    var doc = docs[0];
+
+    console.log(doc);
+
+    res.render('appointmentInfo', {
+      guideID: medic.sanitize(doc.guideID),
+      guideEmail: medic.sanitize(doc.guideEmail),
+      guideName: medic.sanitize(doc.guideName),
+      date: doc.date,
+      time: doc.time,
+      appointmentID: cleanID
+    });
+
+  });
+
+});
 
 router.get('/guidelist', function(req,res) {
   var db = req.db;
@@ -273,6 +309,7 @@ router.post('/appointment', function (req, res) {
 
       var cleanSlotID = medic.sanitize(String(slot.randomID));
       var cleanGuideEmail = medic.sanitize(String(guide.email));
+      var cleanGuideName = medic.sanitize(String(guide.name));
       var cleanEmail = medic.sanitize(String(req.body.responseEmail));
       var cleanRandomID = medic.sanitize(medic.hashOther(randomstring.generate(40)));
       var cleanStartDate = medic.sanitize(String(slot.date));
@@ -281,6 +318,7 @@ router.post('/appointment', function (req, res) {
       var newApt = {
         timeslotID: cleanSlotID,
         guideEmail: cleanGuideEmail,
+        guideName: cleanGuideName,
         responseEmail: cleanEmail,
         randomID: cleanRandomID,
         date: cleanStartDate,

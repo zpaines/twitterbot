@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    link(href='/css/bootstrap.min.css', rel='stylesheet')
+    div.container
+        div.row
+            div.col-lg-8
+                h2 Appointment With #{guideName}
+                p.item-intro.text-muted #{guideName}'s email is #{guideEmail}
+                h4 You have an appointment on #{date} at #{time}
+                p.hidden(id="appointmentID") #{appointmentID}
+                button.btn.btn-danger(type="button" id="deleteButton" data-dismiss="modal") 
+                    i.fa.fa-times Delete Appointment
+    script(src="/js/jquery.js")
+    script(src="/js/bootstrap.min.js")
+    script(src="/javascripts/appointmentInfo.js")

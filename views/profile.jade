@@ -62,7 +62,10 @@ block content
                                         input#newTimeslotTime(type="time", name="time" step="900" class="form-control")
                                     div.form-group.col-xs-4
                                         a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="newTimeslotButton")
-                                            i.glyphicon.glyphicon-plus-sign
+                                            i Save
+                                        &nbsp&nbsp&nbsp
+                                        a.btn.btn-sm.btn-success(data-toggle="modal" href="#repeatingModal" id="repeatingModalButton" type="button")
+                                            i Set Repeating
                         div.modal-footer
                             button.btn.btn-default(data-dismiss="modal") Close
             div.modal.fade(id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
@@ -73,6 +76,42 @@ block content
                                 span(aria-hidden="true") &times;
                             h4.modal-title(id="myModalLabel") Appointments
                         div.modal-body(id="appointmentModalBody")
+                        div.modal-footer
+                            button.btn.btn-default(data-dismiss="modal") Close
+            div.modal.fade(id="repeatingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+                div.modal-dialog(role="document")
+                    div.modal-content
+                        div.modal-header
+                            button.close(time="button" data-dismiss="modal" aria-label="Close")
+                                span(aria-hidden="true") &times;
+                            h4.modal-title(id="myModalLabel") New Repeating Timeslot
+                        div.modal-body(id="newTimeslotModalBody")
+                            form#repeatingTimeslotForm(name="newrepeattimeslot")
+                                div.row
+                                    div.form-group.col-xs-4
+                                        label Day of Week
+                                        select.form-control#dayOfWeek
+                                            option(value="1") Monday
+                                            option(value="2") Tuesday
+                                            option(value="3") Wednesday
+                                            option(value="4") Thursday
+                                            option(value="5") Friday
+                                            option(value="6") Saturday
+                                            option(value="0") Sunday
+                                    div.form-group.col-xs-4
+                                        label Time
+                                        input#repeatTime(type="time", name="time" step="900" class="form-control")
+                                div.row
+                                    div.form-group.col-xs-4
+                                        label Start Date
+                                        input#startDate(type="date", name="date" class="form-control")
+                                    div.form-group.col-xs-4
+                                        label End Date
+                                        input#endDate(type="date", name="date" class="form-control")
+                                    div.form-group.col-xs-4
+                                        label &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                        a.btn.btn-sm.btn-success(data-original-title="Submit" data-toggle="tooltip" type="button submit" id="newRepeatButton" data-dismiss="modal")
+                                            i Save
                         div.modal-footer
                             button.btn.btn-default(data-dismiss="modal") Close
 

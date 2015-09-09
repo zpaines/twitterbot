@@ -13,7 +13,7 @@ var transporter = nodemailer.createTransport({
 
 exports.transporter = transporter;
 
-exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, time) {
+exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, time, aptID) {
 	var recipientString = userEmail + ", " + guideEmail;
 
 	var mailOptions = {

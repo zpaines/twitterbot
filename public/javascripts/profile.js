@@ -1,3 +1,33 @@
+Date.prototype.toDateInputValue = (function() {
+  var local = new Date(this);
+  local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+  return local.toJSON().slice(0,10);
+});
+
+Date.isLeapYear = function (year) { 
+    return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)); 
+};
+
+Date.getDaysInMonth = function (year, month) {
+    return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+};
+
+Date.prototype.isLeapYear = function () { 
+    return Date.isLeapYear(this.getFullYear()); 
+};
+
+Date.prototype.getDaysInMonth = function () { 
+    return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+};
+
+Date.prototype.addMonths = function (value) {
+    var n = this.getDate();
+    this.setDate(1);
+    this.setMonth(this.getMonth() + value);
+    this.setDate(Math.min(n, this.getDaysInMonth()));
+    return this;
+};
+
 $(document).ready(function() {
     var panels = $('.user-infos');
     var panelsButton = $('.dropdown-user');
@@ -39,6 +69,11 @@ $(document).ready(function() {
       postTimeslot();
     });
 
+    $('.modal').on("click", '#newRepeatButton', function() {
+      console.log("new repeat");
+      newRepeatSlot();
+    });
+
     $("#newTimeslotForm").submit(function(){
         postTimeslot();
         return false;
@@ -48,6 +83,29 @@ $(document).ready(function() {
         if (e.keyCode == 13) {
             postTimeslot();
         }
+    });
+
+    $('#repeatingModalButton').click(function(){
+      if ($('#newTimeslotTime').val()) {
+        $('#repeatTime').val($('#newTimeslotTime').val());
+      }
+      if ($('#newTimeslotDate').val()) {
+        console.log($('#newTimeslotDate').val());
+        var tmp = new Date($('#newTimeslotDate').val());
+        var date = new Date(tmp.getTime() + tmp.getTimezoneOffset()*60000);
+        console.log(date.getDay());
+        $('#dayOfWeek').val(date.getDay());
+        $('#startDate').val(date.toDateInputValue());
+        var future = date.addMonths(3);
+        $('#endDate').val(future.toDateInputValue());
+      } else {
+        var today = new Date()
+        $('#startDate').val(today.toDateInputValue());
+        var future = today.addMonths(3);
+        $('#endDate').val(future.toDateInputValue());
+      }
+
+
     });
 
     //Click dropdown
@@ -83,7 +141,7 @@ function updateTimeslotModal() {
     request.success(function(jqXHR, textStatus) {
         $("#currentSlots").empty();
         $.each(request.responseJSON, function(index, value) {
-            $('#currentSlots').append('<p name="slotID">' + value.time + ' on ' + value.date + '&nbsp &nbsp <a class="btn btn-sm btn-danger timeslotDeleteButton" id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </p>')
+            $('#currentSlots').append('<div class="row" style="margin-top:10px"><p name="slotID" class ="col-xs-4">' + value.time + ' on ' + value.date + '</p> <a class="btn btn-sm btn-danger timeslotDeleteButton col-xs-2  " id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </div>')
         });
     });
 }
@@ -112,5 +170,41 @@ function postTimeslot() {
     });
     updateTimeslotModal();
     document.getElementById("newTimeslotForm").reset();
+
+}
+
+function newRepeatSlot() {
+  var tmp = new Date($('#startDate').val());
+  var startDate = new Date(tmp.getTime() + tmp.getTimezoneOffset()*60000);
+  tmp = new Date($('#endDate').val());
+  var endDate = new Date(tmp.getTime() + tmp.getTimezoneOffset()*60000);
+  var weekDay = $('#dayOfWeek').val();
+  console.log(startDate);
+  console.log(endDate);
+  console.log(weekDay);
+  var firstDay = new Date(startDate);
+  if (startDate.getDay() != weekDay) {
+    if (weekDay - startDate.getDay() > 0) {
+      firstDay.setDate(firstDay.getDate() + (weekDay - startDate.getDay()));
+    } else {
+      firstDay.setDate(firstDay.getDate() + (7 + (weekDay - startDate.getDay())));
+    }
+  }
+  var current = new Date(firstDay);
+  while (current <= endDate) {
+    console.log(current);
+    var request = $.ajax({
+           type: "POST",
+           url: "/timeslot",
+           data: {'date': current.getFullYear()+"-"+(current.getMonth()+1)+"-"+current.getDate(), 'time':$('#repeatTime').val()}, // serializes the form's elements.
+         });
+    request.complete(function(jqXHR, textStatus) {
+      console.log("Completed " + textStatus);
+    });
+    current.setDate(current.getDate() + 7);
+  }
+  updateTimeslotModal();
+  document.getElementById("newTimeslotForm");
+  $("#repeatingModal").modal('hide');
 
 }

@@ -21,7 +21,7 @@ exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, tim
 		to: recipientString,
 		subject: "Appointment Scheduled",
 		text: "Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!",
-		html: "<html>Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!</html>"
+		html: "<html>Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> </html>"
 	}
 
 	transporter.sendMail(mailOptions, function (error, info) {

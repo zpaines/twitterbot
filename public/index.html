@@ -100,18 +100,17 @@
                 </div>
             </div>
             <div class="row">
-            <div class="form-group col-xs-4">
-            <input type="text" class="span2 form-control" value="" id="dpd1" placeholder="Arrival Date">
-            </div>
-            <div class="form-group col-xs-4">
+                <div class="form-group col-xs-4 col-lg-offset-2">
+                    <input type="text" class="span2 form-control" value="" id="dpd1" placeholder="Visit Date">
+                </div>
+            <!--<div class="form-group col-xs-4">
             <input type="text" class="span2 form-control" value="" id="dpd2" placeholder="Departure Date">
+            </div>-->
+                <div class="form-group col-xs-4">
+                    <button class="form-control" style="background-color:#9BDDFF" id="updateButton"><font color="white">Refresh</font></button>
+                </div>
             </div>
-            <div class="form-group col-xs-4">
-            <button class="form-control" id="updateButton">Go!</button>
-            </div>
-            </div>
-            <div class="col-xs-6 col-lg-offset-3">
-            <input type="text" class="form-control" size="20" placeholder="Search for a Keyword Here" id="filterEntry"/>
+            <div class="col-xs-6 col-lg-offset-3" id="searchBox">
             </div>
             <br>
             <ul style="list-style:none" class="row" id="team_list">
@@ -234,6 +233,8 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
     <script src="javascripts/datepicker.js"></script>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+
 
     <script src="javascripts/global2.js"></script>
 

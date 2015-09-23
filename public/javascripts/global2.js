@@ -18,24 +18,33 @@ $(document).ready(function() {
     var nowTemp = new Date();
     var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 
+    $('#dpd1').keypress(function(event){
+      if (event.keyCode == '13'){
+        getData(filterGuidesDate());
+      }
+    });
+
     var checkin = $('#dpd1').datepicker({
       onRender: function(date) {
         return date.valueOf() < now.valueOf() ? 'disabled' : '';
       }
     }).on('changeDate', function(ev) {
       startDate = ev.date.getFullYear() * 10000 + (ev.date.getMonth()+1) * 100 + ev.date.getDate();
-      if (ev.date.valueOf() > checkout.date.valueOf()) {
+      /*if (ev.date.valueOf() > checkout.date.valueOf()) {
         var newDate = new Date(ev.date)
         console.log(startDate);
         console.log(endDate);
         newDate.setDate(newDate.getDate() + 1);
-        endDate = newDate.getFullYear() * 10000 + (newDate.getMonth()+1) * 100 + newDate.getDate();
-        checkout.setValue(newDate);
-      }
-      checkin.hide();
-      $('#dpd2')[0].focus();
+        endDate = newDate.getFullYear() * 10000 + (newDate.getMonth()+1) * 100 + newDate.getDate();*/
+        //checkout.setValue(newDate);
+      //}
+      //checkin.hide();
+      console.log("test");
+      getData(filterGuidesDate());
+      //$('#dpd2')[0].focus();
     }).data('datepicker');
-    var checkout = $('#dpd2').datepicker({
+
+    /*var checkout = $('#dpd2').datepicker({
       onRender: function(date) {
         return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
       }
@@ -44,7 +53,7 @@ $(document).ready(function() {
       console.log(startDate);
       console.log(endDate);
       checkout.hide();
-    }).data('datepicker');
+    }).data('datepicker');*/
 
     $('#filterEntry').keyup( function() {
     	var textVal = $(this).val().toLowerCase();
@@ -57,16 +66,66 @@ $(document).ready(function() {
     $('#team_list').on("click", '.team-member', function() {
       console.log("test");
     });
+
+    var postData = "";
+    var handler = StripeCheckout.configure({
+    key: 'pk_test_6pRNASCoBOKtIshFeQd4XMUh',
+    //image: '/img/documentation/checkout/marketplace.png',
+    locale: 'auto',
+    token: function(token) {
+      console.log(token);
+      postData = postData.concat("&token="+token.id);
+      console.log(postData);
+      postData="";
+    }
+  });
+
+    $('body').on("submit", 'form', function() {
+      if (!($(this).serializeArray()[1].value)) {
+        alert("You must enter an email address");
+        return false;
+      }
+      postData = $(this).serialize();
+      console.log(postData);
+     // console.log($(this).serializeArray()[1].value) ;
+      //alert("test");
+      handler.open({
+      name: 'College Connect',
+      description: '1 Tour',
+      email: $(this).serializeArray()[1].value,
+      amount: 2000
+    });
+      return false;
+    });
+    /*$('body').on("click", '.submit', function() {
+      console.log("test2");
+      alert("test2");
+      return false;
+    });*/
     getTimeslots();
+
+  $('body').on('click','.paymentButton', function(e) {
+    // Open Checkout with further options
+    handler.open({
+      name: 'Stripe.com',
+      description: '2 widgets',
+      amount: 2000
+    });
+    e.preventDefault();
+  });
+
+  // Close Checkout on page navigation
+  $(window).on('popstate', function() {
+    handler.close();
+  });
 
   });
 
 // Functions =============================================================
 
-
 function filterGuidesDate() {
   var validID = [];
-  for (var i = startDate; i <= endDate; i++) {
+  for (var i = startDate; i <= startDate; i++) {
     if (timeslots[i]) {
       console.log(i);
       for (var z = 0; z<timeslots[i].length; z++) {
@@ -92,12 +151,21 @@ function getData(validIDs) {
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
     }).done(function(data) {
+      $('#searchBox').empty();
+      var searchBoxRendered = false;
       $.each(data, function(){
           if ($.inArray(this.email, validIDs) > -1) {
+            if (!searchBoxRendered) {
+              searchBoxRendered=true;
+              $('#searchBox').html('<input type="text" class="form-control" size="20" placeholder="Search for a Keyword Here. e.g. Biology, Mandarin, Basketball" id="filterEntry"/>');
+            }
             console.log(this);
             items.push(populateBox(this));
           }
         });
+      if (!searchBoxRendered) {
+        $('#searchBox').html('<i> Sorry, we couldn\'t find any guides for that date');
+      }
       console.log(items);
       $('#team_list').html(items.join("\n"));
     });
@@ -138,7 +206,7 @@ function getData(validIDs) {
   '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
   '<h4 class="modal-title" id="myModalLabel">Make Appointment</h4>'+
   '</div>'+
-  '<form action="/appointment" method="post">' +
+  '<form action="/appointment" id=' + guideInfo.emailString + '" method="post">' +
   '<div class="modal-body">' +
   'Make Appointment With ' + guideInfo.name +
   '<br>Possible Times are: <br>';
@@ -159,7 +227,7 @@ function getData(validIDs) {
   boxHTML +='</div>' +
   '<div class="modal-footer">' +
   '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-  '<button type="button submit" class="btn btn-primary">Schedule It!</button>' +
+  '<button type="button submit paymentButton" id="' + guideInfo.emailString + '" class="btn btn-primary">Schedule It!</button>' +
   '</form>' +
   '</div>' +
   '</div>' +

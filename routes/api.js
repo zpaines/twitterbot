@@ -10,20 +10,35 @@ var randomstring = require('randomstring');
 var medic = require('../medic.js');
 var mailer = require('../mailer.js');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+router.get('/appointmentInfo/:id', function (req, res) {
+  var db = req.db;
+  var appointments = db.get('appointments');
 
-router.get('/logout', medic.requireAuth, function(req, res, next) {
-  res.render('logout');
-});
+  var cleanID = medic.sanitize(req.params.id);
 
-router.get(photoURL + ':filePath', function(req,res) {
-    res.sendFile(path.resolve(photoPath + req.params.filePath));
-});
+  appointments.find({randomID: cleanID}, function (err, docs) {
+    if (err) { return res.status(500).send({error: "Error with appointment lookup"}); }
 
-// router.post('/upload', upload.single('file'), function(req, res) {});
+    var toReturn = [];
+
+    if (docs.length > 1) {
+      return res.status(500).send({error:"Conflicting IDs"});
+    } else if (docs.length < 1) {
+      return res.status(500).send({error:"Appointment Not Found"});
+    }
+
+    var doc = docs[0];
+
+    return res.status(200).send({
+      guideID: medic.sanitize(doc.guideID),
+      guideEmail: medic.sanitize(doc.guideEmail),
+      guideName: medic.sanitize(doc.guideName),
+      date: doc.date,
+      time: doc.time,
+      appointmentID: cleanID
+    });
+  });
+});
 
 router.get('/guidelist', function(req,res) {
   var db = req.db;
@@ -50,7 +65,7 @@ router.get('/guidelist', function(req,res) {
 
 // NOTE(tfs): should probably sanitize most of this again
 router.get('/profile', medic.requireAuth, function(req, res) {
-  res.render('profile', {
+  return res.status(200).send({
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
@@ -60,16 +75,17 @@ router.get('/profile', medic.requireAuth, function(req, res) {
   });
 });
 
-router.get('/edit', medic.requireAuth, function (req, res) {
-  res.render('edit', {
-    name: req.user.name,
-    email: req.user.email,
-    major: req.user.major,
-    language: req.user.language,
-    photoPath: req.user.photoPath,
-    isActivated: req.user.isActivated
-  });
-});
+// Should just use (/api)/profile
+// router.get('/edit', medic.requireAuth, function (req, res) {
+//   res.render('edit', {
+//     name: req.user.name,
+//     email: req.user.email,
+//     major: req.user.major,
+//     language: req.user.language,
+//     photoPath: req.user.photoPath,
+//     isActivated: req.user.isActivated
+//   });
+// });
 
 router.put('/profile', medic.requireAuth, upload.single('guidePicture'), function (req, res) {
   var updatedFields = [];
@@ -110,14 +126,6 @@ router.delete('/profile', medic.requireAuth, function (req, res) {
     mailer.sendAccountDeletion(req.user);
     return res.status(200).send('OK');
   });
-});
-
-router.get('/newguide', function(req, res) {
-  res.render('newguide', {title: 'Add New Guide'});
-});
-
-router.get('/guidelogin', function(req, res) {
-  res.render('guideLogin', {title: 'Log in'});
 });
 
 router.post('/timeslot', medic.requireAuth, medic.requireActivation, function(req, res) {
@@ -179,10 +187,6 @@ router.get('/times', function(req, res) {
       res.send(err);
     }
   });
-});
-
-router.get('/newtime', medic.requireAuth, medic.requireActivation, function(req, res) {
-  res.render('newtime');
 });
 
 // GET route that requires parameters (passed through url formatting - req.query, not req.body)
@@ -247,10 +251,6 @@ router.delete('/timeslot', medic.requireAuth, medic.requireActivation, function 
   });
 });
 
-router.get('/newapt', function (req, res) {
-  res.render('makeapt');
-});
-
 router.post('/appointment', function (req, res) {
   var errorMessage = '';
   errorMessage = medic.checkKeys(req.body, ['slotID', 'responseEmail', 'payToken']);
@@ -273,6 +273,7 @@ router.post('/appointment', function (req, res) {
 
       var cleanSlotID = medic.sanitize(String(slot.randomID));
       var cleanGuideEmail = medic.sanitize(String(guide.email));
+      var cleanGuideName = medic.sanitize(String(guide.name));
       var cleanEmail = medic.sanitize(String(req.body.responseEmail));
       var cleanRandomID = medic.sanitize(medic.hashOther(randomstring.generate(40)));
       var cleanStartDate = medic.sanitize(String(slot.date));
@@ -282,6 +283,7 @@ router.post('/appointment', function (req, res) {
       var newApt = {
         timeslotID: cleanSlotID,
         guideEmail: cleanGuideEmail,
+        guideName: cleanGuideName,
         responseEmail: cleanEmail,
         randomID: cleanRandomID,
         date: cleanStartDate,
@@ -296,7 +298,7 @@ router.post('/appointment', function (req, res) {
 
         apts.insert(newApt, function (e, inserted) {
           if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
-          mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time);
+          mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID);
           return res.status(200).send('OK');
         });
       });

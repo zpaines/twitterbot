@@ -20,7 +20,8 @@ var LocalStrategy = require('passport-local');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var dbURI = process.env.MONGO_URI || 'localhost:27017/tours'
+// var dbURI = process.env.MONGO_URI || 'localhost:27017/tours'
+var dbURI = process.env.MONGOLAB_URI || process.env.MONGOLAB_URL || process.env.MONGOHQ_URL || 'localhost:27017/thelunchbox'
 var db = monk(dbURI);
 
 // Uploading files (guide pictures)
@@ -37,10 +38,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Setup Sessions and Passport
+// var dbSettings = {}
+// if (dbURI != 'localhost:27017/tours') {
+//   // TODO(tfs): Implement non-localhost database hosting
+//   dbSettings.db = 'sessions';
+// } else {
+//   dbSettings.db = 'sessions';
+// }
+
 var dbSettings = {}
-if (dbURI != 'localhost:27017/tours') {
-  // TODO(tfs): Implement non-localhost database hosting
-  dbSettings.db = 'sessions';
+if (dbURI != 'localhost:27017/thelunchbox') {
+  dbSettings.dbname = 'heroku_app35016010';
+  dbSettings.host = 'ds061611.mongolab.com';
+  dbSettings.port = '61611';
+  dbSettings.username = 'heroku_app35016010';
+  dbSettings.password = 'd87ahp1o0796a8bo9irceob3gt';
+  dbSettings.db = 'heroku_app35016010';
 } else {
   dbSettings.db = 'sessions';
 }

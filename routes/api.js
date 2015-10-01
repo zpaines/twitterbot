@@ -10,24 +10,7 @@ var randomstring = require('randomstring');
 var medic = require('../medic.js');
 var mailer = require('../mailer.js');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-router.get('/logout', medic.requireAuth, function(req, res, next) {
-  res.render('logout');
-});
-
-router.get(photoURL + ':filePath', function(req,res) {
-    res.sendFile(path.resolve(photoPath + req.params.filePath));
-});
-
-// router.post('/upload', upload.single('file'), function(req, res) {});
 router.get('/appointmentInfo/:id', function (req, res) {
-  console.log("hit");
-
-
   var db = req.db;
   var appointments = db.get('appointments');
 
@@ -46,9 +29,7 @@ router.get('/appointmentInfo/:id', function (req, res) {
 
     var doc = docs[0];
 
-    console.log(doc);
-
-    res.render('appointmentInfo', {
+    return res.status(200).send({
       guideID: medic.sanitize(doc.guideID),
       guideEmail: medic.sanitize(doc.guideEmail),
       guideName: medic.sanitize(doc.guideName),
@@ -56,9 +37,7 @@ router.get('/appointmentInfo/:id', function (req, res) {
       time: doc.time,
       appointmentID: cleanID
     });
-
   });
-
 });
 
 router.get('/guidelist', function(req,res) {
@@ -86,7 +65,7 @@ router.get('/guidelist', function(req,res) {
 
 // NOTE(tfs): should probably sanitize most of this again
 router.get('/profile', medic.requireAuth, function(req, res) {
-  res.render('profile', {
+  return res.status(200).send({
     name: req.user.name,
     email: req.user.email,
     major: req.user.major,
@@ -96,16 +75,17 @@ router.get('/profile', medic.requireAuth, function(req, res) {
   });
 });
 
-router.get('/edit', medic.requireAuth, function (req, res) {
-  res.render('edit', {
-    name: req.user.name,
-    email: req.user.email,
-    major: req.user.major,
-    language: req.user.language,
-    photoPath: req.user.photoPath,
-    isActivated: req.user.isActivated
-  });
-});
+// Should just use (/api)/profile
+// router.get('/edit', medic.requireAuth, function (req, res) {
+//   res.render('edit', {
+//     name: req.user.name,
+//     email: req.user.email,
+//     major: req.user.major,
+//     language: req.user.language,
+//     photoPath: req.user.photoPath,
+//     isActivated: req.user.isActivated
+//   });
+// });
 
 router.put('/profile', medic.requireAuth, upload.single('guidePicture'), function (req, res) {
   var updatedFields = [];
@@ -146,14 +126,6 @@ router.delete('/profile', medic.requireAuth, function (req, res) {
     mailer.sendAccountDeletion(req.user);
     return res.status(200).send('OK');
   });
-});
-
-router.get('/newguide', function(req, res) {
-  res.render('newguide', {title: 'Add New Guide'});
-});
-
-router.get('/guidelogin', function(req, res) {
-  res.render('guideLogin', {title: 'Log in'});
 });
 
 router.post('/timeslot', medic.requireAuth, medic.requireActivation, function(req, res) {
@@ -217,10 +189,6 @@ router.get('/times', function(req, res) {
   });
 });
 
-router.get('/newtime', medic.requireAuth, medic.requireActivation, function(req, res) {
-  res.render('newtime');
-});
-
 // GET route that requires parameters (passed through url formatting - req.query, not req.body)
 router.get('/guidetimes', function(req, res) {
   var timeslots = req.db.get('timeslots');
@@ -281,10 +249,6 @@ router.delete('/timeslot', medic.requireAuth, medic.requireActivation, function 
       });
     }
   });
-});
-
-router.get('/newapt', function (req, res) {
-  res.render('makeapt');
 });
 
 router.post('/appointment', function (req, res) {

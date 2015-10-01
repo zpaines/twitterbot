@@ -27,6 +27,7 @@ var db = monk(dbURI);
 var upload = multer({dest: photoPath});
 
 // Setup app
+var api = require('./routes/api');
 var routes = require('./routes/index');
 
 var app = express();
@@ -219,6 +220,7 @@ app.get('/admin/activate/:email/:secret', function (req, res) {
   });
 });
 
+app.use('/api', api);
 app.use('/', routes);
 
 // catch 404 and forward to error handler

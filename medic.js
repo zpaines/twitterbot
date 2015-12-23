@@ -3,7 +3,7 @@ var sha512 = require('js-sha512');
 var exports = module.exports = {};
 
 exports.sanitize = function (text) {
-	var match = /[<>;&\*\\/\^_~()]/gi;
+	var match = /[<>;&\*\\/\^~()]/gi;
 	return String(text).replace(match, '');
 }
 

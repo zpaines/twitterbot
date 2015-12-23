@@ -282,27 +282,32 @@ router.post('/appointment', function (req, res) {
       var cleanToken = medic.sanitize(String(req.body.payToken));
 
       // Verify stripe token
+      stripe.tokens.retrieve(cleanToken, function (tokerr, tokenObj) {
+        if (tokerr) { return res.status(400).send("Error with card payment"); }
 
-      var newApt = {
-        timeslotID: cleanSlotID,
-        guideEmail: cleanGuideEmail,
-        guideName: cleanGuideName,
-        responseEmail: cleanEmail,
-        randomID: cleanRandomID,
-        date: cleanStartDate,
-        time: cleanStartTime,
-        payToken: cleanToken
-      }
+        console.log(tokenObj);
 
-      apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
-        if (error) { return res.status(500).send({error:'Database error'}); }
+        var newApt = {
+          timeslotID: cleanSlotID,
+          guideEmail: cleanGuideEmail,
+          guideName: cleanGuideName,
+          responseEmail: cleanEmail,
+          randomID: cleanRandomID,
+          date: cleanStartDate,
+          time: cleanStartTime,
+          payToken: cleanToken
+        }
 
-        if (docs.length > 0) { return res.status(400).send({error:'Appointment already exists for specified time slot'}); }
+        apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
+          if (error) { return res.status(500).send({error:'Database error'}); }
 
-        apts.insert(newApt, function (e, inserted) {
-          if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
-          mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID);
-          return res.status(200).send('OK');
+          if (docs.length > 0) { return res.status(400).send({error:'Appointment already exists for specified time slot'}); }
+
+          apts.insert(newApt, function (e, inserted) {
+            if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
+            mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID);
+            return res.status(200).send('OK');
+          });
         });
       });
     });

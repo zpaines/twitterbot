@@ -21,7 +21,7 @@ var LocalStrategy = require('passport-local');
 var mongo = require('mongodb');
 var monk = require('monk');
 // var dbURI = process.env.MONGO_URI || 'localhost:27017/tours'
-var dbURI = process.env.MONGOLAB_URI || process.env.MONGOLAB_URL || process.env.MONGOHQ_URL || 'localhost:27017/thelunchbox'
+var dbURI = process.env.MONGOLAB_URI || process.env.MONGOLAB_URL || process.env.MONGOHQ_URL || 'localhost:27017/tours'
 var db = monk(dbURI);
 
 // Uploading files (guide pictures)

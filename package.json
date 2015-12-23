@@ -23,6 +23,7 @@
     "passport-local": "latest",
     "js-sha512": "latest",
     "randomstring": "latest",
-    "nodemailer": "latest"
+    "nodemailer": "latest",
+    "xoauth2": "latest"
   }
 }

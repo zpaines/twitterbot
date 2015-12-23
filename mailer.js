@@ -1,15 +1,52 @@
 var nodemailer = require('nodemailer');
+var xoauth2 = require('xoauth2');
 
 var exports = module.exports = {};
 
-// Setup nodemailer
-var transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: process.env.GMAILUSER,
-    pass: process.env.GMAILPASS
-  }
+// Setup xoauth2
+var generator = xoauth2.createXOAuth2Generator({
+	user: process.env.GMAILUSER,
+	clientID: process.env.GMAILCLIENTID,
+	clientSecret: process.env.GMAILCLIENTSECRET,
+	refreshToken: process.env.GMAILREFRESH
 });
+
+// Listen for tokens
+generator.on('token', function(token) {
+	console.log('New token for %s: %s', token.user, token.accessToken);
+});
+
+// Login
+var transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: process.env.GMAILUSER,
+		pass: process.env.GMAILPASS,
+		xoauth2: generator
+	}
+});
+
+// Setup nodemailer
+// var transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   auth: {
+//     user: process.env.GMAILUSER,
+//     pass: process.env.GMAILPASS
+//   }
+// });
+
+// Setup nodemailer with XOAuth2
+// var transporter = nodemailer.createTransport({
+// 	service: "Gmail",
+// 	auth: {
+// 		XOAuth2: {
+// 			user: process.env.GMAILUSER,
+// 			clientId: process.env.GMAILCLIENTID,
+// 			clientSecret: process.env.GMAILCLIENTSECRET,
+// 			refreshToken: process.env.GMAILREFRESH
+// 		}
+// 	}
+// })
 
 exports.transporter = transporter;
 
@@ -50,7 +87,7 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 	});
 }
 
-exports.sendGuideSignup = function (guideObject, secretID) {
+exports.sendGuideSignup = function (guideObject, secretID, hostName) {
 	console.log('-------');
 	console.log(secretID);
 	console.log('-------');
@@ -59,7 +96,7 @@ exports.sendGuideSignup = function (guideObject, secretID) {
 		to: process.env.ADMINEMAIL,
 		subject: "Guide Registration",
 		text: "Hi. " + guideObject.name +" has requested to be registered as a guide. \n Their email address is " + guideObject.email + " and their major is " + guideObject.major +". \n http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + " Click Here to Activate Their Profile",
-		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> <a href=http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + "> Click Here to Activate Their Profile </a></html>"
+		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> <a href=" + hostName + "/" + guideObject.email + "/" + secretID + "> Click Here to Activate Their Profile </a></html>"
 	}
 
 	var guideOptions = {

@@ -13,7 +13,8 @@
     "jade": "~1.11.0",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
-    "mongodb": "latest",
+    "kerberos": "latest",
+    "mongodb": "~1.4",
     "monk": "latest",
     "multer": "~1.0.1",
     "busboy": "~0.2.9",
@@ -23,7 +24,7 @@
     "passport-local": "latest",
     "js-sha512": "latest",
     "randomstring": "latest",
-    "nodemailer": "latest",
-    "xoauth2": "latest"
+    "stripe": "latest",
+    "sendgrid": "1.0.4"
   }
 }

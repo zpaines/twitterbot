@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+
+var stripe = require("stripe")(process.env.STRIPEKEY);
+var medic = require("../medic.js");
+var mailer = require("../mailer.js");
+
+var mongo = require("mongodb");
+var monk = require("monk");
+
+var dbURI = process.env.MONGOLAB_URI || process.env.MONGOLAB_URL || process.env.MONGOHQ_URL || 'localhost:27017/tours'
+var db = monk(dbURI);
+
+var appointments = db.get("appointments");
+var timeslots = db.get("timeslots");
+var charges = db.get("charges");
+
+var datenum = Date.now();
+
+appointments.find({ date: { $lt : datenum } }, function (err, aptdocs) {
+	if (err) { return console.log(err); }
+
+	for (apt in aptdocs) {
+		processPayment(apt);
+	}
+
+	timeslots.delete({ date: { $lt : datenum } }, function (e) {
+		if (err) { return console.log(e); }
+	});
+});
+
+function processPayment(appointment) {
+	var token = appointment.payToken;
+
+	var charge = stripe.charges.create({
+		amount: 2000,
+		currency: "usd",
+		source: token,
+		description: "College Connect appointment charge"
+	}, function (ce, charge) {
+		if (ce && ce.type == "StripeCardError") {
+			console.log("Welp, we're done");
+			console.log(ce);
+		}
+	});
+
+	charges.insert(charge, function (cei) {
+		if (cei)  { return console.log(cei); }
+	});
+
+	appointments.remove({ _id: appointment._id }), function (e) {
+		if (e) { return console.log(e); }
+	});
+}

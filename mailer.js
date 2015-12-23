@@ -1,30 +1,43 @@
-var nodemailer = require('nodemailer');
-var xoauth2 = require('xoauth2');
+// var nodemailer = require('nodemailer');
+// var xoauth2 = require('xoauth2');
+var sendgrid = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 var exports = module.exports = {};
 
-// Setup xoauth2
-var generator = xoauth2.createXOAuth2Generator({
-	user: process.env.GMAILUSER,
-	clientID: process.env.GMAILCLIENTID,
-	clientSecret: process.env.GMAILCLIENTSECRET,
-	refreshToken: process.env.GMAILREFRESH
-});
 
-// Listen for tokens
-generator.on('token', function(token) {
-	console.log('New token for %s: %s', token.user, token.accessToken);
-});
+// sendgrid.send({
+//   to:       'example@example.com',
+//   from:     'other@example.com',
+//   subject:  'Hello World',
+//   text:     'My first email through SendGrid.'
+// }, function(err, json) {
+//   if (err) { return console.error(err); }
+//   console.log(json);
+// });
+
+
+// Setup xoauth2
+// var generator = xoauth2.createXOAuth2Generator({
+// 	user: process.env.GMAILUSER,
+// 	clientID: process.env.GMAILCLIENTID,
+// 	clientSecret: process.env.GMAILCLIENTSECRET,
+// 	refreshToken: process.env.GMAILREFRESH
+// });
+
+// // Listen for tokens
+// generator.on('token', function(token) {
+// 	console.log('New token for %s: %s', token.user, token.accessToken);
+// });
 
 // Login
-var transporter = nodemailer.createTransport({
-	service: 'gmail',
-	auth: {
-		user: process.env.GMAILUSER,
-		pass: process.env.GMAILPASS,
-		xoauth2: generator
-	}
-});
+// var transporter = nodemailer.createTransport({
+// 	service: 'gmail',
+// 	auth: {
+// 		user: process.env.GMAILUSER,
+// 		pass: process.env.GMAILPASS,
+// 		xoauth2: generator
+// 	}
+// });
 
 // Setup nodemailer
 // var transporter = nodemailer.createTransport({
@@ -48,7 +61,7 @@ var transporter = nodemailer.createTransport({
 // 	}
 // })
 
-exports.transporter = transporter;
+// exports.transporter = transporter;
 
 exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, time, aptID) {
 	var recipientString = userEmail + ", " + guideEmail;
@@ -61,9 +74,8 @@ exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, tim
 		html: "<html>Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> </html>"
 	}
 
-	transporter.sendMail(mailOptions, function (error, info) {
+	sendgrid.send(mailOptions, function (error, info) {
 		if (error) {
-
 			return console.log(error);
 		}
 	});
@@ -80,7 +92,7 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 		html: "<html>Hello. Unfortunately your appointment for " + date + " at " + time + " has been canceled. </html>"
 	}
 
-	transporter.sendMail(mailOptions, function (error, info) {
+	sendgrid.send(mailOptions, function (error, info) {
 		if (error) {
 			return console.log(error);
 		}
@@ -88,9 +100,9 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 }
 
 exports.sendGuideSignup = function (guideObject, secretID, hostName) {
-	console.log('-------');
-	console.log(secretID);
-	console.log('-------');
+	// console.log('-------');
+	// console.log(secretID);
+	// console.log('-------');
 	var adminOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,
@@ -107,13 +119,13 @@ exports.sendGuideSignup = function (guideObject, secretID, hostName) {
 		html: "<html>Thanks for applying to be a guide! Please wait for an admin to activate your account. You'll receive an email when that happens. </html>"
 	}
 
-	transporter.sendMail(adminOptions, function (error, info) {
+	sendgrid.send(adminOptions, function (error, info) {
 		if (error) {
 			return console.log(error);
 		}
 	});
 
-	transporter.sendMail(guideOptions, function (error, info) {
+	sendgrid.send(guideOptions, function (error, info) {
 		if (error) {
 			return console.log(error);
 		}
@@ -129,7 +141,7 @@ exports.sendGuideActivation = function (guideObject) {
 		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at http://localhost:3000/profile </html>"
 	}
 
-	transporter.sendMail(mailOptions, function (error, info) {
+	sendgrid.send(mailOptions, function (error, info) {
 		if (error) {
 			return console.log(error);
 		}

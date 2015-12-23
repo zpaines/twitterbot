@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+var stripe = require("stripe");
+var medic = require("../medic.js");
+var mailer = require("../mailer.js");
+
+var mongo = require("mongodb");
+var monk = require("monk");
+
+var dbURI = process.env.MONGOLAB_URI || process.env.MONGOLAB_URL || process.env.MONGOHQ_URL || 'localhost:27017/tours'
+var db = monk(dbURI);
+
+var appointments = db.get("appointments");
+
+appointments.find({  })

@@ -43,7 +43,7 @@ $(document).ready(function() {
     $('.modal').on("click", '.timeslotDeleteButton', function() {
         var request = $.ajax({
            type: "DELETE",
-           url: "/timeslot",
+           url: "/api/timeslot",
            data: {"randomID":this.id} // serializes the form's elements.
          });
         request.complete(function(jqXHR, textStatus) {
@@ -56,7 +56,7 @@ $(document).ready(function() {
     $('.modal').on("click", '.appointmentCancelButton', function() {
         var request = $.ajax({
            type: "DELETE",
-           url: "/appointment/" + this.id,
+           url: "/api/appointment/" + this.id,
          });
         request.complete(function(jqXHR, textStatus) {
             if (jqXHR.status == 200) {
@@ -135,7 +135,7 @@ function updateTimeslotModal() {
     var emailAddress = $('#guideEmailAddress').html();
     var request = $.ajax({
        type: "GET",
-       url: "/guidetimes",
+       url: "/api/guidetimes",
        data: {"guideEmail":emailAddress}, // serializes the form's elements.
      });
     request.success(function(jqXHR, textStatus) {
@@ -149,7 +149,7 @@ function updateTimeslotModal() {
 function updateAppointmentModal() {
     var request = $.ajax({
        type: "GET",
-       url: "/appointments",
+       url: "/api/appointments",
      });
     request.success(function(jqXHR, textStatus) {
         console.log("Test");
@@ -163,7 +163,7 @@ function updateAppointmentModal() {
 function postTimeslot() {
     var request = $.ajax({
            type: "POST",
-           url: "/timeslot",
+           url: "/api/timeslot",
            data: $("#newTimeslotForm").serialize(), // serializes the form's elements.
          });
     request.complete(function(jqXHR, textStatus) {
@@ -195,7 +195,7 @@ function newRepeatSlot() {
     console.log(current);
     var request = $.ajax({
            type: "POST",
-           url: "/timeslot",
+           url: "/api/timeslot",
            data: {'date': current.getFullYear()+"-"+(current.getMonth()+1)+"-"+current.getDate(), 'time':$('#repeatTime').val()}, // serializes the form's elements.
          });
     request.complete(function(jqXHR, textStatus) {

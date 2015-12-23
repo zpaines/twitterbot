@@ -6,6 +6,7 @@ var photoURL = "/picture/";
 var upload = multer({dest: photoPath});
 var path = require('path');
 var randomstring = require('randomstring');
+var stripe = require('stripe')(process.env.STRIPEKEY);
 
 var medic = require('../medic.js');
 var mailer = require('../mailer.js');
@@ -279,6 +280,8 @@ router.post('/appointment', function (req, res) {
       var cleanStartDate = medic.sanitize(String(slot.date));
       var cleanStartTime = medic.sanitize(String(slot.time));
       var cleanToken = medic.sanitize(String(req.body.payToken));
+
+      // Verify stripe token
 
       var newApt = {
         timeslotID: cleanSlotID,

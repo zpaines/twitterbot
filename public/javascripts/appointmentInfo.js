@@ -3,7 +3,7 @@ $(document).ready(function() {
   $('#deleteButton').click(function() {
       var request = $.ajax({
          type: "DELETE",
-         url: "/appointment/" + id,
+         url: "/api/appointment/" + id,
        });
   });
 });

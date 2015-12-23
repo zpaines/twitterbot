@@ -146,7 +146,7 @@ function getData(validIDs) {
 
     // jQuery AJAX call for JSON
     $.ajax({
-      url: 'http://localhost:3000/guidelist',
+      url: '/api/guidelist',
       type: "GET",
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
@@ -239,7 +239,7 @@ function getData(validIDs) {
 
 function getTimeslots() {
   $.ajax({
-    url: 'http://localhost:3000/times',
+    url: '/api/times',
     type: "GET",
     dataType: "json",
     error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},

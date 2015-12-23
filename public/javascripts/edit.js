@@ -24,7 +24,7 @@ function submitEdit() {
         console.log(data);
         var request = $.ajax({
            type: "PUT",
-           url: "/profile",
+           url: "/api/profile",
            data: data, // serializes the form's elements.
          });
         request.complete(function(jqXHR, textStatus) {

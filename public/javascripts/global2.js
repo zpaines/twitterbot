@@ -41,6 +41,7 @@ $(document).ready(function() {
       //checkin.hide();
       console.log("test");
       getData(filterGuidesDate());
+      console.log($('#filterEntry'));
       //$('#dpd2')[0].focus();
     }).data('datepicker');
 
@@ -55,14 +56,6 @@ $(document).ready(function() {
       checkout.hide();
     }).data('datepicker');*/
 
-    $('#filterEntry').keyup( function() {
-    	var textVal = $(this).val().toLowerCase();
-    	$("li.col-sm-4").each(function() {
-    		var text = $(this).text().toLowerCase();
-    		(text.indexOf(textVal) >= 0) ? $(this).show() : $(this).hide();
-    	});
-
-    });
     $('#team_list').on("click", '.team-member', function() {
       console.log("test");
     });
@@ -74,9 +67,18 @@ $(document).ready(function() {
     locale: 'auto',
     token: function(token) {
       console.log(token);
-      postData = postData.concat("&token="+token.id);
+      postData = postData.concat("&payToken="+token.id);
       console.log(postData);
-      postData="";
+      var request = $.ajax({
+           type: "POST",
+           url: "/api/appointment",
+           data: postData, // serializes the form's elements.
+         });
+      request.complete(function(jqXHR, textStatus) {
+        if (jqXHR.status == 215) {
+          console.log("Bad Entry");
+        } 
+      });
     }
   });
 
@@ -158,6 +160,14 @@ function getData(validIDs) {
             if (!searchBoxRendered) {
               searchBoxRendered=true;
               $('#searchBox').html('<input type="text" class="form-control" size="20" placeholder="Search for a Keyword Here. e.g. Biology, Mandarin, Basketball" id="filterEntry"/>');
+       			  $('#filterEntry').keyup( function() {
+      		    	var textVal = $(this).val().toLowerCase();
+      		    	console.log("test");
+      		    	$("li.col-sm-4").each(function() {
+      		    		var text = $(this).text().toLowerCase();
+      		    		(text.indexOf(textVal) >= 0) ? $(this).show() : $(this).hide();
+      		    	});
+              });           
             }
             console.log(this);
             items.push(populateBox(this));
@@ -214,7 +224,6 @@ function getData(validIDs) {
   if (guideTimeslots[guideInfo.email]) {
     for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
       var slot = guideTimeslots[guideInfo.email][i];
-      console.log(slot);
       boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
     }
     boxHTML += '<div class="form-group">' + 

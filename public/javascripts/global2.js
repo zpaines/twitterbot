@@ -39,7 +39,6 @@ $(document).ready(function() {
         //checkout.setValue(newDate);
       //}
       //checkin.hide();
-      console.log("test");
       getData(filterGuidesDate());
       //$('#dpd2')[0].focus();
     }).data('datepicker');
@@ -64,7 +63,6 @@ $(document).ready(function() {
 
     });
     $('#team_list').on("click", '.team-member', function() {
-      console.log("test");
     });
 
     var postData = "";
@@ -73,9 +71,7 @@ $(document).ready(function() {
     //image: '/img/documentation/checkout/marketplace.png',
     locale: 'auto',
     token: function(token) {
-      console.log(token);
-      postData = postData.concat("&token="+token.id);
-      console.log(postData);
+      postData = postData.concat("&payToken="+token.id);
       postData="";
     }
   });
@@ -86,7 +82,6 @@ $(document).ready(function() {
         return false;
       }
       postData = $(this).serialize();
-      console.log(postData);
      // console.log($(this).serializeArray()[1].value) ;
       //alert("test");
       handler.open({
@@ -127,15 +122,11 @@ function filterGuidesDate() {
   var validID = [];
   for (var i = startDate; i <= startDate; i++) {
     if (timeslots[i]) {
-      console.log(i);
       for (var z = 0; z<timeslots[i].length; z++) {
         validID.push(timeslots[i][z].guideEmail);
-        console.log(timeslots[i][z].guideEmail);
-        console.log(validID);
       }
     }
   }
-  console.log(validID);
   return validID;
 };
 // Fill table with data
@@ -159,14 +150,12 @@ function getData(validIDs) {
               searchBoxRendered=true;
               $('#searchBox').html('<input type="text" class="form-control" size="20" placeholder="Search for a Keyword Here. e.g. Biology, Mandarin, Basketball" id="filterEntry"/>');
             }
-            console.log(this);
             items.push(populateBox(this));
           }
         });
       if (!searchBoxRendered) {
         $('#searchBox').html('<i> Sorry, we couldn\'t find any guides for that date');
       }
-      console.log(items);
       $('#team_list').html(items.join("\n"));
     });
 
@@ -186,7 +175,6 @@ function getData(validIDs) {
   guideInfo.emailString = guideInfo.email;
   guideInfo.emailString = guideInfo.emailString.replace("@", "");
   guideInfo.emailString = guideInfo.emailString.replace(".", "");
-  console.log(guideInfo.emailString);
 	boxHTML =  '<li class="col-sm-4">' +
   '<div class="team-member">' +
   '<img src=' +  guideInfo.photoPath + ' class="img-responsive img-circle" alt="">' +
@@ -210,11 +198,9 @@ function getData(validIDs) {
   '<div class="modal-body">' +
   'Make Appointment With ' + guideInfo.name +
   '<br>Possible Times are: <br>';
-  console.log(guideTimeslots[guideInfo.email]);
   if (guideTimeslots[guideInfo.email]) {
     for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
       var slot = guideTimeslots[guideInfo.email][i];
-      console.log(slot);
       boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
     }
     boxHTML += '<div class="form-group">' + 
@@ -251,13 +237,12 @@ function getTimeslots() {
       }
       guideTimeslots[this.guideEmail].push(this);
 
-      this.date = this.date.split('-').join('');
+      //this.date = this.date.split('-').join('');
       if (!timeslots[parseInt(this.date)]) {
         timeslots[parseInt(this.date)] = [];
       }
       timeslots[parseInt(this.date)].push(this);
 
-      console.log(timeslots);
     });
   });
 };

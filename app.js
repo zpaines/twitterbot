@@ -118,120 +118,121 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req,res,next) {
     req.db = db;
+    req.passport = passport;
     next();
 });
 
-app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
-  var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
+// app.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
+//   var errorMessage = medic.checkKeys(req.body, ['guideName', 'guideEmail', 'guideMajor', 'guideLanguage', 'guidePassword', 'guidePasswordConfirm']);
 
-  if (errorMessage != '') {
-    return res.status(500).send({error: "Missing fields"});
-  }
+//   if (errorMessage != '') {
+//     return res.status(500).send({error: "Missing fields"});
+//   }
 
-  var raw1 = medic.sanitize(req.body.guidePassword);
-  var raw2 = medic.sanitize(req.body.guidePasswordConfirm);
+//   var raw1 = medic.sanitize(req.body.guidePassword);
+//   var raw2 = medic.sanitize(req.body.guidePasswordConfirm);
 
-  var p1 = medic.hashPass(raw1);
-  var p2 = medic.hashPass(raw2);
+//   var p1 = medic.hashPass(raw1);
+//   var p2 = medic.hashPass(raw2);
 
-  var randomID = randomstring.generate(30);
+//   var randomID = randomstring.generate(30);
 
-  if (p1 != p2) {
-    res.status(500).send({error: 'Error Passwords Don\'t match'});
-    return;
-  }
+//   if (p1 != p2) {
+//     res.status(500).send({error: 'Error Passwords Don\'t match'});
+//     return;
+//   }
 
-  if ((req.file == undefined) || (req.file.filename == undefined)) {
-    errorMessage += "No picture provided;";
-  }
+//   if ((req.file == undefined) || (req.file.filename == undefined)) {
+//     errorMessage += "No picture provided;";
+//   }
 
-  if (errorMessage == '') {
-    var db = req.db;
-    var guides = db.get('guides');
+//   if (errorMessage == '') {
+//     var db = req.db;
+//     var guides = db.get('guides');
 
-    guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
-      if (docs.length > 0) {
-        return res.json({ error: "That username exists already." });
-      } else {
-        var newGuide = {
-          name: medic.sanitize(req.body.guideName),
-          email: medic.sanitize(req.body.guideEmail),
-          major: medic.sanitize(req.body.guideMajor),
-          language: medic.sanitize(req.body.guideLanguage),
-          photoPath: '/picture/' + medic.sanitize(req.file.filename),
-          hashedPassword: p1,
-          hashedRandomID: medic.hashOther(randomID),
-          isActivated: false
-        };
+//     guides.find({ email: medic.sanitize(req.body.guideEmail) }, function (error, docs) {
+//       if (docs.length > 0) {
+//         return res.json({ error: "That username exists already." });
+//       } else {
+//         var newGuide = {
+//           name: medic.sanitize(req.body.guideName),
+//           email: medic.sanitize(req.body.guideEmail),
+//           major: medic.sanitize(req.body.guideMajor),
+//           language: medic.sanitize(req.body.guideLanguage),
+//           photoPath: '/picture/' + medic.sanitize(req.file.filename),
+//           hashedPassword: p1,
+//           hashedRandomID: medic.hashOther(randomID),
+//           isActivated: false
+//         };
 
-        guides.insert(newGuide, function (err, inserted) {
-          if (!err) {
-            req.logIn(inserted, function (err) {
-              if (err) {
-                return res.status(500).send({error: 'Error logging in new user; User saved.'});
-              } else {
-                mailer.sendGuideSignup(newGuide, randomID);
-                return res.redirect('/profile');
-              }
-            });
-          } else {
-            return res.status(500).send({error: 'Could not save account information'});
-          }
-        });
-      }
-    });
-  } else {
-    return res.status(400).send({error:errorMessage});
-  }
-});
+//         guides.insert(newGuide, function (err, inserted) {
+//           if (!err) {
+//             req.logIn(inserted, function (err) {
+//               if (err) {
+//                 return res.status(500).send({error: 'Error logging in new user; User saved.'});
+//               } else {
+//                 mailer.sendGuideSignup(newGuide, randomID);
+//                 return res.redirect('/profile');
+//               }
+//             });
+//           } else {
+//             return res.status(500).send({error: 'Could not save account information'});
+//           }
+//         });
+//       }
+//     });
+//   } else {
+//     return res.status(400).send({error:errorMessage});
+//   }
+// });
 
-// From passport's site
-app.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { console.log('a'); return next(err); }
-    if (!user) { console.log('b'); return res.status(215).send({error:'Not authorized'}); }
-    req.logIn(user, function(err) {
-      if (err) { console.log('c'); return next(err); }
-      console.log('d'); return res.status(200).send('OK');
-    });
-  })(req, res, next);
-});
+// // From passport's site
+// app.post('/login', function(req, res, next) {
+//   passport.authenticate('local', function(err, user, info) {
+//     if (err) { console.log('a'); return next(err); }
+//     if (!user) { console.log('b'); return res.status(215).send({error:'Not authorized'}); }
+//     req.logIn(user, function(err) {
+//       if (err) { console.log('c'); return next(err); }
+//       console.log('d'); return res.status(200).send('OK');
+//     });
+//   })(req, res, next);
+// });
 
-app.get('/logout', function (req, res) {
-  if (req.isAuthenticated()) {
-    req.logout();
-  }
-  res.redirect('/guideLogin');
-});
+// app.get('/logout', function (req, res) {
+//   if (req.isAuthenticated()) {
+//     req.logout();
+//   }
+//   res.redirect('/guideLogin');
+// });
 
-app.get('/admin/activate/:email/:secret', function (req, res) {
-  secretID = medic.sanitize(req.params.secret);
-  cleanEmail = medic.sanitize(req.params.email);
+// app.get('/admin/activate/:email/:secret', function (req, res) {
+//   secretID = medic.sanitize(req.params.secret);
+//   cleanEmail = medic.sanitize(req.params.email);
 
-  var db = req.db;
-  var guides = db.get('guides');
+//   var db = req.db;
+//   var guides = db.get('guides');
 
-  guides.find({email: cleanEmail}, function (err, docs) {
-    if (docs.length > 1) {
-      return res.status(400).send({error: "Multiple entries with specified email found"});
-    } else if (docs.length == 0) {
-      return res.status(400).send({error: "No entries with specified email found"});
-    } else {
-      if (medic.hashOther(secretID) != docs[0].hashedRandomID) {
-        return res.status(215).send({error: "Invalid secret ID"});
-      } else {
-        newGuide = docs[0];
-        console.log(newGuide);
-        newGuide.isActivated = true;
-        guides.update({email: cleanEmail}, newGuide, function (e, doc) {
-          if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
-          mailer.sendGuideActivation(docs[0]);
-          return res.status(200).send('Account Activated');
-        });
-      }
-    }
-  });
-});
+//   guides.find({email: cleanEmail}, function (err, docs) {
+//     if (docs.length > 1) {
+//       return res.status(400).send({error: "Multiple entries with specified email found"});
+//     } else if (docs.length == 0) {
+//       return res.status(400).send({error: "No entries with specified email found"});
+//     } else {
+//       if (medic.hashOther(secretID) != docs[0].hashedRandomID) {
+//         return res.status(215).send({error: "Invalid secret ID"});
+//       } else {
+//         newGuide = docs[0];
+//         console.log(newGuide);
+//         newGuide.isActivated = true;
+//         guides.update({email: cleanEmail}, newGuide, function (e, doc) {
+//           if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
+//           mailer.sendGuideActivation(docs[0]);
+//           return res.status(200).send('Account Activated');
+//         });
+//       }
+//     }
+//   });
+// });
 
 app.use('/api', api);
 app.use('/', routes);

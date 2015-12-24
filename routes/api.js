@@ -61,7 +61,7 @@ router.post('/guideSignup', upload.single('guidePicture'), function (req, res) {
               if (err) {
                 return res.status(500).send({error: 'Error logging in new user; User saved.'});
               } else {
-                mailer.sendGuideSignup(newGuide, randomID);
+                mailer.sendGuideSignup(newGuide, randomID, req.headers.host);
                 return res.redirect('/profile');
               }
             });
@@ -117,7 +117,7 @@ router.get('/admin/activate/:email/:secret', function (req, res) {
         newGuide.isActivated = true;
         guides.update({email: cleanEmail}, newGuide, function (e, doc) {
           if (err) { return res.status(500).send({error:"Error accessing guide database"}); }
-          mailer.sendGuideActivation(docs[0]);
+          mailer.sendGuideActivation(docs[0], req.headers.host);
           return res.status(200).send('Account Activated');
         });
       }
@@ -252,7 +252,7 @@ router.post('/timeslot', medic.requireAuth, medic.requireActivation, function(re
   }
 
   var newTimeslot = {
-    date: medic.sanitize(Date.parse(String(req.body.date))),
+    date: parseInt(Date.parse(String(req.body.date))),
     time: medic.sanitize(req.body.time),
     guideEmail: req.user.email,
     randomID: medic.sanitize(randomstring.generate(35))

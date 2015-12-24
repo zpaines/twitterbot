@@ -29,7 +29,10 @@ $(document).ready(function() {
         return date.valueOf() < now.valueOf() ? 'disabled' : '';
       }
     }).on('changeDate', function(ev) {
-      startDate = ev.date.getFullYear() * 10000 + (ev.date.getMonth()+1) * 100 + ev.date.getDate();
+      //startDate = ev.date.getFullYear() * 10000 + (ev.date.getMonth()+1) * 100 + ev.date.getDate();
+      t = new Date(ev.date - ev.date.getTimezoneOffset() * 60000);
+      startDate = t.getTime();
+
       /*if (ev.date.valueOf() > checkout.date.valueOf()) {
         var newDate = new Date(ev.date)
         console.log(startDate);
@@ -71,8 +74,19 @@ $(document).ready(function() {
     //image: '/img/documentation/checkout/marketplace.png',
     locale: 'auto',
     token: function(token) {
+      console.log(token);
       postData = postData.concat("&payToken="+token.id);
-      postData="";
+      console.log(postData);
+      var request = $.ajax({
+           type: "POST",
+           url: "/api/appointment",
+           data: postData, // serializes the form's elements.
+         });
+      request.complete(function(jqXHR, textStatus) {
+        if (jqXHR.status == 215) {
+          console.log("Bad Entry");
+        } 
+      });
     }
   });
 
@@ -120,6 +134,8 @@ $(document).ready(function() {
 
 function filterGuidesDate() {
   var validID = [];
+  console.log(startDate)
+  console.log(timeslots)
   for (var i = startDate; i <= startDate; i++) {
     if (timeslots[i]) {
       for (var z = 0; z<timeslots[i].length; z++) {
@@ -201,7 +217,7 @@ function getData(validIDs) {
   if (guideTimeslots[guideInfo.email]) {
     for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
       var slot = guideTimeslots[guideInfo.email][i];
-      boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
+      boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + millisecondsToString(slot.date) + '</label><br>';
     }
     boxHTML += '<div class="form-group">' + 
                //'<label for="email" style=" font-weight: normal !important">Your Email (a confirmation will be sent to you):</label>' + 
@@ -231,7 +247,7 @@ function getTimeslots() {
     error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
   }).done(function(data) {
     $.each(data, function(){
-      this.dateString = this.date;
+      this.date;
       if (!guideTimeslots[this.guideEmail]) {
         guideTimeslots[this.guideEmail] = [];
       }
@@ -268,3 +284,13 @@ function showUserInfo(event) {
     $('#guidePicture').attr("src", thisUserObject.photoPath);
 
   };
+
+  var monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+function millisecondsToString(milliseconds) {
+  d = new Date(parseInt(milliseconds));
+  string = "" + monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  return string;
+}

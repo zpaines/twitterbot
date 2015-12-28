@@ -100,7 +100,7 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 }
 
 exports.sendGuideSignup = function (guideObject, secretID, hostName) {
-	var link = hostName + "/api/" + guideObject.email + "/" + secretID;
+	var link = hostName + "/api/admin/activate/" + guideObject.email + "/" + secretID;
 	var adminOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,
@@ -134,7 +134,7 @@ exports.sendGuideActivation = function (guideObject, hostName) {
 		to: guideObject.email,
 		subject: "Account Activated",
 		text: "Hi",
-		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at " + hostName + "/api/profile </html>"
+		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at " + hostName + "/profile </html>"
 	}
 
 	sendgrid.send(mailOptions, function (error, info) {

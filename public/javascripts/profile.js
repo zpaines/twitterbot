@@ -140,6 +140,7 @@ function updateTimeslotModal() {
      });
     request.success(function(jqXHR, textStatus) {
         $("#currentSlots").empty();
+        console.log(request.responseJSON);
         $.each(request.responseJSON, function(index, value) {
             $('#currentSlots').append('<div class="row" style="margin-top:10px"><p name="slotID" class ="col-xs-4">' + value.time + ' on ' + millisecondsToString(value.date) + '</p> <a class="btn btn-sm btn-danger timeslotDeleteButton col-xs-2  " id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </div>')
         });
@@ -166,7 +167,8 @@ var monthNames = ["January", "February", "March", "April", "May", "June",
 
 function millisecondsToString(milliseconds) {
   console.log(milliseconds);
-  var d = new Date(parseInt(milliseconds));
+  var d = new Date();
+  d = new Date(parseInt(milliseconds) + d.getTimezoneOffset()*60000);
   console.log(d);
   var string = "" + monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
   console.log(string);

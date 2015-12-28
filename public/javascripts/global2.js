@@ -217,7 +217,9 @@ function getData(validIDs) {
   if (guideTimeslots[guideInfo.email]) {
     for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
       var slot = guideTimeslots[guideInfo.email][i];
-      boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + millisecondsToString(slot.date) + '</label><br>';
+      if (startDate == slot.date) {
+        boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + millisecondsToString(slot.date) + '</label><br>';
+      }
     }
     boxHTML += '<div class="form-group">' + 
                //'<label for="email" style=" font-weight: normal !important">Your Email (a confirmation will be sent to you):</label>' + 
@@ -290,7 +292,8 @@ function showUserInfo(event) {
 ];
 
 function millisecondsToString(milliseconds) {
-  d = new Date(parseInt(milliseconds));
+  var d = new Date();
+  d = new Date(parseInt(milliseconds) + d.getTimezoneOffset()*60000);
   string = "" + monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
   return string;
 }

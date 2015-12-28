@@ -70,7 +70,7 @@ $(document).ready(function() {
 
     var postData = "";
     var handler = StripeCheckout.configure({
-    key: 'pk_test_6pRNASCoBOKtIshFeQd4XMUh',
+    key: 'pk_test_XCAzWzzeouxk70vHvuFnHqeL',
     //image: '/img/documentation/checkout/marketplace.png',
     locale: 'auto',
     token: function(token) {

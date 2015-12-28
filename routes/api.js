@@ -371,6 +371,7 @@ router.post('/appointment', function (req, res) {
   errorMessage = medic.checkKeys(req.body, ['slotID', 'responseEmail', 'payToken']);
 
   if (errorMessage != '') {
+    console.log('a');
     return res.status(400).send({error:"Not enough fields specified"});
   }
 
@@ -379,13 +380,14 @@ router.post('/appointment', function (req, res) {
   var guides = req.db.get('guides');
 
   timeslots.find({randomID: medic.sanitize(req.body.slotID)}, {}, function (err, slotResults) {
-    if ((err) || (slotResults.length != 1)) { return res.status(500).send({error:'Lookup of timeslot failed'}); }
+    if ((err) || (slotResults.length != 1)) { console.log('b'); return res.status(500).send({error:'Lookup of timeslot failed'}); }
     slot = slotResults[0];
 
     guides.find({email: medic.sanitize(String(slot.guideEmail))}, {}, function (er, guideResults) {
-      if ((err) || (guideResults.length != 1)) { return res.status(500).send({error:'Lookup of guide failed'}); }
+      if ((err) || (guideResults.length != 1)) { console.log('c'); return res.status(500).send({error:'Lookup of guide failed'}); }
       guide = guideResults[0];
 
+      console.log('d');
       var cleanSlotID = medic.sanitize(String(slot.randomID));
       var cleanGuideEmail = medic.sanitize(String(guide.email));
       var cleanGuideName = medic.sanitize(String(guide.name));
@@ -397,7 +399,7 @@ router.post('/appointment', function (req, res) {
 
       // Verify stripe token
       stripe.tokens.retrieve(cleanToken, function (tokerr, tokenObj) {
-        if (tokerr) { return res.status(400).send("Error with card payment"); }
+        if (tokerr) { console.log('e'); return res.status(400).send("Error with card payment"); }
 
         console.log(tokenObj);
 
@@ -412,13 +414,15 @@ router.post('/appointment', function (req, res) {
           payToken: cleanToken
         }
 
-        apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
-          if (error) { return res.status(500).send({error:'Database error'}); }
+        console.log("f");
 
-          if (docs.length > 0) { return res.status(400).send({error:'Appointment already exists for specified time slot'}); }
+        apts.find({timeslotID: newApt.timeslotID}, {}, function (error, docs) {
+          if (error) { console.log('g'); return res.status(500).send({error:'Database error'}); }
+
+          if (docs.length > 0) { console.log('h'); return res.status(400).send({error:'Appointment already exists for specified time slot'}); }
 
           apts.insert(newApt, function (e, inserted) {
-            if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
+            if (e) { console.log("h"); return res.status(500).send({error:'Failed to save appointment'}); }
             mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID, req.headers.host);
             return res.status(200).send('OK');
           });

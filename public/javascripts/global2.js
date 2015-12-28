@@ -29,7 +29,10 @@ $(document).ready(function() {
         return date.valueOf() < now.valueOf() ? 'disabled' : '';
       }
     }).on('changeDate', function(ev) {
-      startDate = ev.date.getFullYear() * 10000 + (ev.date.getMonth()+1) * 100 + ev.date.getDate();
+      //startDate = ev.date.getFullYear() * 10000 + (ev.date.getMonth()+1) * 100 + ev.date.getDate();
+      t = new Date(ev.date - ev.date.getTimezoneOffset() * 60000);
+      startDate = t.getTime();
+
       /*if (ev.date.valueOf() > checkout.date.valueOf()) {
         var newDate = new Date(ev.date)
         console.log(startDate);
@@ -39,7 +42,6 @@ $(document).ready(function() {
         //checkout.setValue(newDate);
       //}
       //checkin.hide();
-      console.log("test");
       getData(filterGuidesDate());
       //$('#dpd2')[0].focus();
     }).data('datepicker');
@@ -64,7 +66,6 @@ $(document).ready(function() {
 
     });
     $('#team_list').on("click", '.team-member', function() {
-      console.log("test");
     });
 
     var postData = "";
@@ -74,9 +75,18 @@ $(document).ready(function() {
     locale: 'auto',
     token: function(token) {
       console.log(token);
-      postData = postData.concat("&token="+token.id);
+      postData = postData.concat("&payToken="+token.id);
       console.log(postData);
-      postData="";
+      var request = $.ajax({
+           type: "POST",
+           url: "/api/appointment",
+           data: postData, // serializes the form's elements.
+         });
+      request.complete(function(jqXHR, textStatus) {
+        if (jqXHR.status == 215) {
+          console.log("Bad Entry");
+        } 
+      });
     }
   });
 
@@ -86,7 +96,6 @@ $(document).ready(function() {
         return false;
       }
       postData = $(this).serialize();
-      console.log(postData);
      // console.log($(this).serializeArray()[1].value) ;
       //alert("test");
       handler.open({
@@ -125,17 +134,15 @@ $(document).ready(function() {
 
 function filterGuidesDate() {
   var validID = [];
+  console.log(startDate)
+  console.log(timeslots)
   for (var i = startDate; i <= startDate; i++) {
     if (timeslots[i]) {
-      console.log(i);
       for (var z = 0; z<timeslots[i].length; z++) {
         validID.push(timeslots[i][z].guideEmail);
-        console.log(timeslots[i][z].guideEmail);
-        console.log(validID);
       }
     }
   }
-  console.log(validID);
   return validID;
 };
 // Fill table with data
@@ -159,14 +166,12 @@ function getData(validIDs) {
               searchBoxRendered=true;
               $('#searchBox').html('<input type="text" class="form-control" size="20" placeholder="Search for a Keyword Here. e.g. Biology, Mandarin, Basketball" id="filterEntry"/>');
             }
-            console.log(this);
             items.push(populateBox(this));
           }
         });
       if (!searchBoxRendered) {
         $('#searchBox').html('<i> Sorry, we couldn\'t find any guides for that date');
       }
-      console.log(items);
       $('#team_list').html(items.join("\n"));
     });
 
@@ -186,7 +191,6 @@ function getData(validIDs) {
   guideInfo.emailString = guideInfo.email;
   guideInfo.emailString = guideInfo.emailString.replace("@", "");
   guideInfo.emailString = guideInfo.emailString.replace(".", "");
-  console.log(guideInfo.emailString);
 	boxHTML =  '<li class="col-sm-4">' +
   '<div class="team-member">' +
   '<img src=' +  guideInfo.photoPath + ' class="img-responsive img-circle" alt="">' +
@@ -210,12 +214,12 @@ function getData(validIDs) {
   '<div class="modal-body">' +
   'Make Appointment With ' + guideInfo.name +
   '<br>Possible Times are: <br>';
-  console.log(guideTimeslots[guideInfo.email]);
   if (guideTimeslots[guideInfo.email]) {
     for (var i=0; i<guideTimeslots[guideInfo.email].length; i++) {
       var slot = guideTimeslots[guideInfo.email][i];
-      console.log(slot);
-      boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + slot.dateString + '</label><br>';
+      if (startDate == slot.date) {
+        boxHTML += '<input type="radio" name="slotID" value = "' + slot.randomID + '" id = "' + slot.randomID + '"> <label for ="' + slot.randomID + '">' + slot.time + ' on ' + millisecondsToString(slot.date) + '</label><br>';
+      }
     }
     boxHTML += '<div class="form-group">' + 
                //'<label for="email" style=" font-weight: normal !important">Your Email (a confirmation will be sent to you):</label>' + 
@@ -245,19 +249,18 @@ function getTimeslots() {
     error: function(jqXHR, textStatus, errorThrown) { alert(errorThrown)},
   }).done(function(data) {
     $.each(data, function(){
-      this.dateString = this.date;
+      this.date;
       if (!guideTimeslots[this.guideEmail]) {
         guideTimeslots[this.guideEmail] = [];
       }
       guideTimeslots[this.guideEmail].push(this);
 
-      this.date = this.date.split('-').join('');
+      //this.date = this.date.split('-').join('');
       if (!timeslots[parseInt(this.date)]) {
         timeslots[parseInt(this.date)] = [];
       }
       timeslots[parseInt(this.date)].push(this);
 
-      console.log(timeslots);
     });
   });
 };
@@ -283,3 +286,14 @@ function showUserInfo(event) {
     $('#guidePicture').attr("src", thisUserObject.photoPath);
 
   };
+
+  var monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+function millisecondsToString(milliseconds) {
+  var d = new Date();
+  d = new Date(parseInt(milliseconds) + d.getTimezoneOffset()*60000);
+  string = "" + monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  return string;
+}

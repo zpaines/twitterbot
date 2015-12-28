@@ -140,8 +140,9 @@ function updateTimeslotModal() {
      });
     request.success(function(jqXHR, textStatus) {
         $("#currentSlots").empty();
+        console.log(request.responseJSON);
         $.each(request.responseJSON, function(index, value) {
-            $('#currentSlots').append('<div class="row" style="margin-top:10px"><p name="slotID" class ="col-xs-4">' + value.time + ' on ' + value.date + '</p> <a class="btn btn-sm btn-danger timeslotDeleteButton col-xs-2  " id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </div>')
+            $('#currentSlots').append('<div class="row" style="margin-top:10px"><p name="slotID" class ="col-xs-4">' + value.time + ' on ' + millisecondsToString(value.date) + '</p> <a class="btn btn-sm btn-danger timeslotDeleteButton col-xs-2  " id="' + value.randomID +'" data-original-title="Remove This Timeslot" data-toggle="tooltip" type="button"> <i>Delete</i> </a> </div>')
         });
     });
 }
@@ -155,12 +156,27 @@ function updateAppointmentModal() {
         console.log("Test");
         $("#appointmentModalBody").empty();
         $.each(request.responseJSON, function(index, value) {
-            $('#appointmentModalBody').append('<p name="slotID">' + value.time + ' on ' + value.date + ' with ' + value.responseEmail + '&nbsp &nbsp <a class="btn btn-sm btn-danger appointmentCancelButton" id="' + value.randomID +'" data-original-title="Cancle This Appointment" data-toggle="tooltip" type="button"> <i>Cancel</i> </a> </p>')
+            $('#appointmentModalBody').append('<p name="slotID">' + value.time + ' on ' + millisecondsToString(value.date) + ' with ' + value.responseEmail + '&nbsp &nbsp <a class="btn btn-sm btn-danger appointmentCancelButton" id="' + value.randomID +'" data-original-title="Cancle This Appointment" data-toggle="tooltip" type="button"> <i>Cancel</i> </a> </p>')
         });
     });
 }
 
+var monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+function millisecondsToString(milliseconds) {
+  console.log(milliseconds);
+  var d = new Date();
+  d = new Date(parseInt(milliseconds) + d.getTimezoneOffset()*60000);
+  console.log(d);
+  var string = "" + monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  console.log(string);
+  return string;
+}
+
 function postTimeslot() {
+  console.log($("#newTimeslotForm").serialize());
     var request = $.ajax({
            type: "POST",
            url: "/api/timeslot",

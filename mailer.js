@@ -63,15 +63,16 @@ var exports = module.exports = {};
 
 // exports.transporter = transporter;
 
-exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, time, aptID) {
+exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, time, aptID, hostName) {
 	var recipientString = userEmail + ", " + guideEmail;
+
+	var link = hostName + "/appointmentInfo/" + aptID;
 
 	var mailOptions = {
 		from: "College Connect JHU <collegeconnectjhu@gmail.com>",
 		to: recipientString,
 		subject: "Appointment Scheduled",
-		text: "Hi! You have a new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!",
-		html: "<html>Hi! You have a new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> </html>"
+		html: "<html>Hi! You have a new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> Link: " + link + " </html>"
 	}
 
 	sendgrid.send(mailOptions, function (error, info) {

@@ -419,7 +419,7 @@ router.post('/appointment', function (req, res) {
 
           apts.insert(newApt, function (e, inserted) {
             if (e) { return res.status(500).send({error:'Failed to save appointment'}); }
-            mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID);
+            mailer.sendAppointmentConfirmation(newApt.responseEmail, newApt.guideEmail, newApt.date, newApt.time, cleanRandomID, req.headers.host);
             return res.status(200).send('OK');
           });
         });

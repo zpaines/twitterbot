@@ -252,7 +252,7 @@ router.post('/timeslot', medic.requireAuth, medic.requireActivation, function(re
   }
 
   var newTimeslot = {
-    date: parseInt(medic.sanitize(Date.parse(String(req.body.date)))),
+    date: parseInt(Date.parse(String(req.body.date))),
     time: medic.sanitize(req.body.time),
     guideEmail: req.user.email,
     randomID: medic.sanitize(randomstring.generate(35))

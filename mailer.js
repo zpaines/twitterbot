@@ -100,22 +100,18 @@ exports.sendAppointmentCancelation = function (userEmail, guideEmail, date, time
 }
 
 exports.sendGuideSignup = function (guideObject, secretID, hostName) {
-	// console.log('-------');
-	// console.log(secretID);
-	// console.log('-------');
+	var link = hostName + "/api/" + guideObject.email + "/" + secretID;
 	var adminOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,
 		subject: "Guide Registration",
-		text: "Hi. " + guideObject.name +" has requested to be registered as a guide. \n Their email address is " + guideObject.email + " and their major is " + guideObject.major +". \n " + hostName + "/admin/activate/" + guideObject.email + "/" + secretID + " Click Here to Activate Their Profile",
-		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> <a href=" + hostName + "/" + guideObject.email + "/" + secretID + "> Click Here to Activate Their Profile </a></html>"
+		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> Activation link for their profile: " + link + "</html>"
 	}
 
 	var guideOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: guideObject.email,
 		subject: "Registration Confirmation",
-		text: "Thank you for applying, please wait for an admin to activate your account",
 		html: "<html>Thanks for applying to be a guide! Please wait for an admin to activate your account. You'll receive an email when that happens. </html>"
 	}
 
@@ -138,7 +134,7 @@ exports.sendGuideActivation = function (guideObject, hostName) {
 		to: guideObject.email,
 		subject: "Account Activated",
 		text: "Hi",
-		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at " + hostName + "/profile </html>"
+		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at " + hostName + "/api/profile </html>"
 	}
 
 	sendgrid.send(mailOptions, function (error, info) {

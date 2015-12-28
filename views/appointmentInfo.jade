@@ -7,7 +7,15 @@ block content
             div.col-lg-8
                 h2 Appointment With #{guideName}
                 p.item-intro.text-muted #{guideName}'s email is #{guideEmail}
-                h4 You have an appointment on #{date} at #{time}
+                script(type="text/javascript").
+                    var s = "<h4> You have an appointment on ";
+                    milliseconds = "#{date}";
+                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    time = "#{time}"
+                    var d = new Date();
+                    d = new Date(parseInt(milliseconds) + d.getTimezoneOffset()*60000);
+                    s += monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " at " + time + "</h4>";
+                    document.write(s);
                 p.hidden(id="appointmentID") #{appointmentID}
                 button.btn.btn-danger(type="button" id="deleteButton" data-dismiss="modal") 
                     i.fa.fa-times Delete Appointment

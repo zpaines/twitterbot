@@ -70,8 +70,8 @@ exports.sendAppointmentConfirmation = function (userEmail, guideEmail, date, tim
 		from: "College Connect JHU <collegeconnectjhu@gmail.com>",
 		to: recipientString,
 		subject: "Appointment Scheduled",
-		text: "Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!",
-		html: "<html>Hi! You have an new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> </html>"
+		text: "Hi! You have a new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you!",
+		html: "<html>Hi! You have a new guide appointment on " + date + " at " + time + ". We're looking forward to seeing you! <br> </html>"
 	}
 
 	sendgrid.send(mailOptions, function (error, info) {
@@ -107,7 +107,7 @@ exports.sendGuideSignup = function (guideObject, secretID, hostName) {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: process.env.ADMINEMAIL,
 		subject: "Guide Registration",
-		text: "Hi. " + guideObject.name +" has requested to be registered as a guide. \n Their email address is " + guideObject.email + " and their major is " + guideObject.major +". \n http://localhost:3000/admin/activate/" + guideObject.email + "/" + secretID + " Click Here to Activate Their Profile",
+		text: "Hi. " + guideObject.name +" has requested to be registered as a guide. \n Their email address is " + guideObject.email + " and their major is " + guideObject.major +". \n " + hostName + "/admin/activate/" + guideObject.email + "/" + secretID + " Click Here to Activate Their Profile",
 		html: "<html>Hi. " + guideObject.name +" has requested to be registered as a guide. <br> Their email address is " + guideObject.email + " and their major is " + guideObject.major +". <br> <a href=" + hostName + "/" + guideObject.email + "/" + secretID + "> Click Here to Activate Their Profile </a></html>"
 	}
 
@@ -132,13 +132,13 @@ exports.sendGuideSignup = function (guideObject, secretID, hostName) {
 	});
 }
 
-exports.sendGuideActivation = function (guideObject) {
+exports.sendGuideActivation = function (guideObject, hostName) {
 	var mailOptions = {
 		from: "College Connect JHU <collegeconnect.jhu@gmail.com>",
 		to: guideObject.email,
 		subject: "Account Activated",
 		text: "Hi",
-		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at http://localhost:3000/profile </html>"
+		html: "<html>Hi " + guideObject.name + "! Your account has been activated. Get started at " + hostName + "/profile </html>"
 	}
 
 	sendgrid.send(mailOptions, function (error, info) {

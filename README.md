@@ -1,2 +1,2 @@
 # twitterbot
-Linking prospective students with current students
+A web based tool designed to link prospective college students to current students for tours (or any other kind of meeting). Allows current students to set which times they are open with an innovative scheduling tool built in bootstrap and jquery. Current students can create bios of interests and majors, and prospective students can filter their "guide" by availability time and/or any other property listed in their bio.
